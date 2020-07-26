@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
+import TypingCard from '../../components/TypingCard'
 
 class Index extends Component {
-	render() {
-		return (
-			<div className="shadow-radius">
-				<div >
-					<h1>这是一个通用的后台管理系统，基于 react+react-router+react-redux+antd 开发。</h1>
-					<p>基本功能包含：登录、登出、数据存储、路由权限控制、Echarts、数据表格等，UI采用 Ant Design 风格。</p>
-				</div>
-			</div>
-		);
-	}
+
+  render () {
+    const cardContent = `欢迎登录重庆工业职业技术学院考试测评系统。`
+    return (
+      <div className="shadow-radius">
+        <div >
+          <TypingCard source={cardContent} ></TypingCard>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default Index;
