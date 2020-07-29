@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './index.scss';
-import { Select, Form, Row, Col, Modal, Button } from 'antd';
-import { UserOutlined, HistoryOutlined } from '@ant-design/icons';
+import { Select, Form, Row, Col, Modal } from 'antd';
+import { Icon } from 'antd'
 import java from '../../../src/assets/img/myClass/java.jpg'
 
 const { Option } = Select;
@@ -40,7 +40,7 @@ class Index extends Component {
 
         </div>
         <div className="shadow-radius">
-          <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+          <Row type="flex">
             {
               [{ name: 'Java', time: '2020-07-25', teacher: '张老师', state: '已结束' },
               { name: 'Html', time: '2020-07-25', teacher: '张老师', state: '已结束' },
@@ -68,38 +68,37 @@ class ClassBlock extends Component {
   openModal = (item) => {
     this.setState({ visible: true })
   }
+  handleOk = () => {
+    let that = this
+    setTimeout(() => {
+      that.setState({
+        visible: false,
+      })
+    })
+
+  };
   render () {
     const { visible } = this.state;
     return (
-      <Col className="gutter-row class-col" onClick={this.openModal(this.props.item)}>
+      <Col className="class-col" onClick={() => this.openModal(this.props.item)}>
         <div className="class-fm">
           <div className="class-img-father">
             <img src={java} className="class-img" alt={java} />
             <div className="class-fm-state" style={{ color: this.props.item.state === "已结束" ? 'red' : '#00bfff' }}>{this.props.item.state}</div>
           </div>
           <div className="ml-20 font-size-22 class-fm-name">{this.props.item.name}</div>
-          <div className="class-fm-info"><span><HistoryOutlined />{this.props.item.time}</span><span><UserOutlined />{this.props.item.teacher}</span></div>
+          <div className="class-fm-info"><span><Icon type="history" />{this.props.item.time}</span><span><Icon type="user" />{this.props.item.teacher}</span></div>
         </div>
         {
           visible ? <Modal
-            visible={visible}
-            title="Title"
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-            footer={[
-              <Button key="back" onClick={this.handleCancel}>
-                Return
-            </Button>,
-              <Button key="submit" type="primary" onClick={this.handleOk}>
-                Submit
-            </Button>,
-            ]}
+            title="课程详情"
+            visible={this.state.visible}
+            onOk={() => this.handleOk()}
+            onCancel={() => this.handleOk()}
           >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
+            <p><label>课程：</label><span>Java</span></p>
+            <p><label>内容：</label><span>Java基础语法</span></p>
+            <p><label>课程周期：</label><span>180天</span></p>
           </Modal> : null
         }
 
