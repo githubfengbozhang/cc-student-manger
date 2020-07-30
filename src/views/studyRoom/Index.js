@@ -15,7 +15,6 @@ class Index extends Component {
   }
 
   startExam = () => {
-    debugger
     let that = this
     setTimeout(() => {
       that.setState({

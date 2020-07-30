@@ -201,14 +201,17 @@ class Index extends React.Component {
         </div>
         <div className="shadow-radius">
           <Table pagination={false} dataSource={dataSource} columns={columns} style={{ marginBottom: '40px', width: "800px" }} className="table-box" />
-          <div className="data-flex">
-            <div style={{ width: '100%', marginRight: '10px' }}>
-              <Chart chartData={chartData} height={'200px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
-            </div>
-            <div style={{ width: '100%', marginLeft: '10px' }}>
-              <Chart chartData={chartBarData} height={'200px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+          <div className="chart-block">
+            <div className="data-flex">
+              <div style={{ width: '100%', marginRight: '10px' }}>
+                <Chart chartData={chartData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+              </div>
+              <div style={{ width: '100%', marginLeft: '10px' }}>
+                <Chart chartData={chartBarData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     );
