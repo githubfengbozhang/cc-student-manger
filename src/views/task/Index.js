@@ -83,9 +83,9 @@ class Index extends Component {
               width={200}
               render={(text, record) => (
                 <span>
-                  <a>查看 {record.lastName}</a>
+                  <a href='#'>查看 {record.lastName}</a>
                   <Divider type="vertical" />
-                  <a>重做</a>
+                  <a href='#'>重做</a>
                 </span>
               )}
             />

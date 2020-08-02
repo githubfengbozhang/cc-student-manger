@@ -153,11 +153,6 @@ class Index extends Component {
     }
   }
   render () {
-    const layout = {
-      labelCol: { span: 8 },
-      wrapperCol: { span: 16 },
-      layout: 'inline'
-    };
     const { state } = this.state
     const cardContent = `欢迎登录重庆工业职业技术学院考试测评系统。`
     return (

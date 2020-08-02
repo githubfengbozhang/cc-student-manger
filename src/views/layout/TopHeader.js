@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Avatar, Dropdown, Menu, Badge } from 'antd';
+import { Icon, Avatar, Dropdown, Menu } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { setUserInfo } from '@/redux/actions/userInfo';
@@ -90,11 +90,11 @@ class TopHeader extends Component {
             <div className="setting">
               <Icon style={{ fontSize: '21px', cursor: 'pointer' }} type="setting" onClick={this.setting} />
             </div>
-            <div className="news-wrap">
+            {/* <div className="news-wrap">
               <Badge count={3}>
                 <Icon style={{ fontSize: '21px', cursor: 'pointer' }} type="bell" onClick={this.toNews} />
               </Badge>
-            </div>
+            </div> */}
             <div className="dropdown-wrap" id="dropdown-wrap" style={{ cursor: 'pointer' }}>
               <Dropdown getPopupContainer={() => document.getElementById('dropdown-wrap')} overlay={DropdownList}>
                 <div>
