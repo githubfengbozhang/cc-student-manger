@@ -4,6 +4,8 @@ import { Form, Icon, Input, Button } from 'antd';
 import { connect } from 'react-redux';
 import { setUserInfo } from '@/redux/actions/userInfo';
 import '@/assets/css/login';
+import $axios from "@/axios/$axios";
+import qs from 'qs'
 
 const FormItem = Form.Item;
 class Login extends Component {
@@ -16,11 +18,19 @@ class Login extends Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        localStorage.setItem('isLogin', '1');
-        // 模拟生成一些数据
-        this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } }));
-        localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } })));
-        this.props.history.push('/dashboard');
+        $axios.post('/exam/api/student/single/login', qs.stringify(values)).then((res) => {
+          debugger
+        })
+        // localStorage.setItem('isLogin', '1');
+        // // 模拟生成一些数据
+        // this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } }));
+        // localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } })));
+        // if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+        //   this.props.history.push('/phoneExam');
+        // } else {
+        //   this.props.history.push('/dashboard');
+        // }
+
       } else {
         console.log(err);
       }

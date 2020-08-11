@@ -1,0 +1,45 @@
+.ts-contetn{
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  margin: 40px;
+}
+.start-btn{
+  width: 100px;
+}
+.exam{
+  margin:20px 60px 0 150px;
+}
+.exam-header{
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  font-size: 22px;
+}
+.exam-icon{
+  height: 25px;
+  display: inline-block;
+  width: 70px;
+  line-height: 25px;
+  background-color: #1890ff;
+  border-radius: 10px 10px 0 10px;
+  font-size: 16px;
+  color: white;
+  text-align: center;
+  margin-right: 15px;
+}
+.exam-content{
+  padding-left: 90px;
+  padding-top: 20px;
+}
+.exam-time{
+  color: red;
+}
+.exam-btn{
+  padding-left: 90px;
+  padding-top: 50px;
+}
+// 工具类
+.mr-20{
+  margin-right: 20px;
+}
