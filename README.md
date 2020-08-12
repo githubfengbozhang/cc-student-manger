@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## React-Antd-Admin
 
 ### 简介
@@ -90,7 +89,5 @@ npm run build
 * [React](https://reactjs.org)
 
 :heart: :heart:欢迎 star 支持:kissing_heart: :kissing_heart:
-=======
 # cc-student-manger
 重工学生在校管理
->>>>>>> 5f12c9921c40261602632617329c5b2647ade58c
