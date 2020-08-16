@@ -48,7 +48,6 @@ class Login extends Component {
           }
 
         })
-
       } else {
         console.log(err);
       }

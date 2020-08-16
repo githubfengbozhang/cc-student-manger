@@ -185,7 +185,6 @@ class Index extends Component {
             <Column title="考试时长" dataIndex="duration" key="duration" />
             <Column title="任务状态" dataIndex="status" key="status"
               render={(text, record) => {
-                debugger
                 if (record.status * 1 === 0) {
                   return '进行中'
                 } else if (record.status * 1 === 1) {
