@@ -1,22 +1,39 @@
 import axios from 'axios';
 import { message } from 'antd';
+import qs from "qs";
+
 const $axios = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
   timeout: 6000,
   retry: 4,
   retryDelay: 1000
 });
-
+const fillterData = function (data) {
+  const fillter = JSON.stringify(data, (key, value) => {
+    if (!value) {
+      return undefined;
+    }
+    return value;
+  })
+  return JSON.parse(fillter)
+};
 //请求拦截
 $axios.interceptors.request.use(
   function (config) {
-    debugger
     // 在发送请求之前做些什么
     // 通过reudx的store拿到拿到全局状态树的token ，添加到请求报文，后台会根据该报文返回status
     // 此处应根据具体业务写token
     // const token = store.getState().user.token || localStorage.getItem('token');
     // const token = 'FA2019';
     // config.headers['X-Token'] = token;
+    if (localStorage.getItem('userId')) {
+      if (config.data) {
+        const data = fillterData({ "userId": localStorage.getItem('userId'), ...qs.parse(config.data) })
+        config.data = qs.stringify(data)
+      } else {
+        config.data = qs.stringify({ "userId": localStorage.getItem('userId') })
+      }
+    }
     return config;
   },
   function (error) {

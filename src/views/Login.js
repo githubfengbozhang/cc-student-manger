@@ -13,23 +13,41 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.onResize = this.onResize.bind(this);
+    this.state = {
+      msg: ''
+    }
   }
   login = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         $axios.post('/exam/api/student/single/login', qs.stringify(values)).then((res) => {
-          debugger
+          const {
+            code,
+            msg,
+            data
+          } = res.data
+          if (code === 0) {
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userName', data.userName);
+            localStorage.setItem('isLogin', true);
+            // 模拟生成一些数据
+            this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: data.userName } }));
+            localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: data.userName } })));
+            if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+              this.props.history.push('/phoneExam');
+            } else {
+              this.props.history.push('/dashboard');
+            }
+          } else {
+            setTimeout(() => {
+              this.setState({
+                msg
+              })
+            })
+          }
+
         })
-        // localStorage.setItem('isLogin', '1');
-        // // 模拟生成一些数据
-        // this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } }));
-        // localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } })));
-        // if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
-        //   this.props.history.push('/phoneExam');
-        // } else {
-        //   this.props.history.push('/dashboard');
-        // }
 
       } else {
         console.log(err);
@@ -82,7 +100,7 @@ class Login extends Component {
               <Button type="primary" htmlType="submit" block onClick={this.login}>
                 登录
 							</Button>
-              <div style={{ color: '#999', paddingTop: '10px', textAlign: 'center' }}>Tips : 输入任意用户名密码即可</div>
+              <div style={{ color: '#999', paddingTop: '10px', textAlign: 'center' }}>{this.state.msg}</div>
             </FormItem>
           </Form>
         </div>
