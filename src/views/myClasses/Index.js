@@ -10,7 +10,7 @@ import TypingCard from '../../components/TypingCard'
 const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
-const cardContent = `亲爱的同学暂时还未有与您有关的课程，请刷新或耐心等待！`
+const cardContent = `亲爱的同学暂时还未匹配到与您查询有关的课程，请刷新或耐心等待！`
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },

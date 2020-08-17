@@ -92,13 +92,14 @@ class Index extends Component {
     let that = this;
     that.props.form.validateFields((err, values) => {
       if (!err) {
+        debugger
         const data = values.date
         that.setState({
           status: values.status,
           courseId: values.courseId,
           type: values.type,
-          beginTime: data[0].format('YYYY-MM-DD HH:mm:ss'),
-          endTime: data[1].format('YYYY-MM-DD HH:mm:ss'),
+          beginTime: `${data[0].format('YYYY-MM-DD')} 00:00:00`,
+          endTime: `${data[1].format('YYYY-MM-DD')} 23:59:59`,
         }, () => {
           that.getData()
         })
@@ -142,7 +143,7 @@ class Index extends Component {
             <FormItem label="时间" name="size">
               {
                 getFieldDecorator('date')(
-                  <RangePicker onChange={() => this.onChangeRangePicker} />
+                  <RangePicker />
                 )
               }
 
@@ -189,6 +190,17 @@ class Index extends Component {
                   return '进行中'
                 } else if (record.status * 1 === 1) {
                   return '已结束'
+                } else {
+                  return '-'
+                }
+              }}
+            />
+            <Column title="任务类型" dataIndex="paperType" key="paperType"
+              render={(text, record) => {
+                if (record.paperType * 1 === 0) {
+                  return '考试'
+                } else if (record.paperType * 1 === 1) {
+                  return '作业测试'
                 } else {
                   return '-'
                 }
