@@ -9,95 +9,112 @@ import qs from 'qs'
 
 const FormItem = Form.Item;
 class Login extends Component {
-    state = { clientHeight: document.documentElement.clientHeight || document.body.clientHeight };
-    constructor(props) {
-        super(props);
-        this.onResize = this.onResize.bind(this);
+  state = { clientHeight: document.documentElement.clientHeight || document.body.clientHeight };
+  constructor(props) {
+    super(props);
+    this.onResize = this.onResize.bind(this);
+    this.state = {
+      msg: ''
     }
-    login = e => {
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                $axios.post('/exam/api/student/single/login', qs.stringify(values)).then((res) => {
-                    debugger
-                })
-                // localStorage.setItem('isLogin', '1');
-                // // 模拟生成一些数据
-                // this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } }));
-                // localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: '超级管理员' } })));
-                // if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
-                //   this.props.history.push('/phoneExam');
-                // } else {
-                //   this.props.history.push('/dashboard');
-                // }
-
+  }
+  login = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        $axios.post('/exam/api/student/single/login', qs.stringify(values)).then((res) => {
+          const {
+            code,
+            msg,
+            data
+          } = res.data
+          if (code === 0) {
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userName', data.userName);
+            localStorage.setItem('isLogin', true);
+            // 模拟生成一些数据
+            this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: data.userName } }));
+            localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: data.userName } })));
+            if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+              this.props.history.push('/phoneExam');
             } else {
-                console.log(err);
+              this.props.history.push('/dashboard');
             }
-        });
+          } else {
+            setTimeout(() => {
+              this.setState({
+                msg
+              })
+            })
+          }
+
+        })
+      } else {
+        console.log(err);
+      }
+    });
+  };
+  componentDidMount () {
+    window.addEventListener('resize', this.onResize);
+  }
+  componentWillUnmount () {
+    window.addEventListener('resize', this.onResize);
+    // componentWillMount进行异步操作时且在callback中进行了setState操作时，需要在组件卸载时清除state
+    this.setState = () => {
+      return;
     };
-    componentDidMount () {
-        window.addEventListener('resize', this.onResize);
-    }
-    componentWillUnmount () {
-        window.addEventListener('resize', this.onResize);
-        // componentWillMount进行异步操作时且在callback中进行了setState操作时，需要在组件卸载时清除state
-        this.setState = () => {
-            return;
-        };
-    }
-    onResize () {
-        this.setState({ clientHeight: document.documentElement.clientHeight || document.body.clientHeight });
-    }
-    render () {
-        const { getFieldDecorator } = this.props.form;
-        return (
-            <div className="container">
-                <Particles
-                    height={this.state.clientHeight - 5 + 'px'}
-                    params={{
-                        number: { value: 50 },
-                        ize: { value: 3 },
-                        interactivity: {
-                            events: {
-                                onhover: { enable: true, mode: 'repulse' }
-                            }
-                        }
-                    }}
-                />
-                <div className="content">
-                    <div className="title">考试测评管理系统</div>
-                    <Form className="login-form">
-                        <FormItem>
-                            {getFieldDecorator('userName', {
-                                rules: [{ required: true, message: '请填写用户名！' }]
-                            })(<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />)}
-                        </FormItem>
-                        <FormItem>
-                            {getFieldDecorator('password', {
-                                rules: [{ required: true, message: '请填写密码！' }]
-                            })(<Input.Password prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="密码" />)}
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary" htmlType="submit" block onClick={this.login}>
-                                登录
+  }
+  onResize () {
+    this.setState({ clientHeight: document.documentElement.clientHeight || document.body.clientHeight });
+  }
+  render () {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <div className="container">
+        <Particles
+          height={this.state.clientHeight - 5 + 'px'}
+          params={{
+            number: { value: 50 },
+            ize: { value: 3 },
+            interactivity: {
+              events: {
+                onhover: { enable: true, mode: 'repulse' }
+              }
+            }
+          }}
+        />
+        <div className="content">
+          <div className="title">考试测评管理系统</div>
+          <Form className="login-form">
+            <FormItem>
+              {getFieldDecorator('userName', {
+                rules: [{ required: true, message: '请填写用户名！' }]
+              })(<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />)}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('password', {
+                rules: [{ required: true, message: '请填写密码！' }]
+              })(<Input.Password prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="密码" />)}
+            </FormItem>
+            <FormItem>
+              <Button type="primary" htmlType="submit" block onClick={this.login}>
+                登录
 							</Button>
-                            <div style={{ color: '#999', paddingTop: '10px', textAlign: 'center' }}>Tips : 输入任意用户名密码即可</div>
-                        </FormItem>
-                    </Form>
-                </div>
-            </div>
-        );
-    }
+              <div style={{ color: '#999', paddingTop: '10px', textAlign: 'center' }}>{this.state.msg}</div>
+            </FormItem>
+          </Form>
+        </div>
+      </div>
+    );
+  }
 }
 
 const mapStateToProps = state => state;
 const mapDispatchToProps = dispatch => ({
-    setUserInfo: data => {
-        dispatch(setUserInfo(data));
-    }
+  setUserInfo: data => {
+    dispatch(setUserInfo(data));
+  }
 });
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Form.create()(Login));

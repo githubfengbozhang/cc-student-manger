@@ -4,6 +4,9 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
+import moment from 'moment';
+import 'moment/locale/zh-cn'
+moment.locale('en');
 console.log(`Looks like we are in ${process.env.REACT_APP_BASE_URL} mode!`);
 ReactDOM.render(
   <ConfigProvider locale={zhCN}><App /></ConfigProvider>,

@@ -9,6 +9,7 @@ import { routes } from '@/router/routes';
 import FullScreen from '@/components/FullScreen';
 import Tags from './Tags';
 import BasicDrawer from '@/components/BasicDrawer';
+import blueLogo from '@/assets/img/blueLogo.png'
 
 class TopHeader extends Component {
   state = { visible: false };
@@ -82,7 +83,7 @@ class TopHeader extends Component {
       <div className="top-header">
         <div className="top-header-inner">
           <Icon className="trigger" type={true ? 'menu-unfold' : 'menu-fold'} onClick={this.toggle} />
-          <div className="header-title">重庆工业职业技术学院 | 考试测评系统</div>
+          <div className="header-title"><img src={blueLogo} style={{ height: '30px' }}></img> | 考试测评系统</div>
           <div className="header-right">
             <div className="full-screen">
               <FullScreen />

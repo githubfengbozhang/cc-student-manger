@@ -14,7 +14,7 @@
   margin: 20px;
 }
 .class-img-father{
-  @include w-h(100%, 200px);
+  @include w-h(100%, 280px);
   position: relative;
 }
 .class-img-father::after{
@@ -22,16 +22,16 @@
   position: absolute;
   top: 0;
   left: 0;
-  @include w-h(100%, 200px);
+  @include w-h(100%, 280px);
   background-color: black;
   border-radius: 10px 10px 0 0;
   opacity: 0.05;
 }
 .class-img{
-  @include w-h(100%, 200px);
+  @include w-h(100%, 280px);
 }
 .class-fm{
-  @include w-h(250px, 280px);
+  @include w-h(320px, 380px);
   border-radius: 10px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.1);
   cursor: pointer;
@@ -62,6 +62,9 @@
 }
 .ml-20{
   margin-left: 20px;
+}
+.mb-40{
+  margin-bottom: 40px;
 }
 .font-size-16{
   font-size: 16px;
