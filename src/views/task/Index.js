@@ -3,6 +3,7 @@ import { Select, Form, DatePicker, Button, Table, Divider, Modal } from 'antd';
 import './index.scss';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
+import { withRouter } from 'react-router-dom'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -26,6 +27,7 @@ class Index extends Component {
       modalData: {}
     };
   }
+  // 弹窗确定
   handleOk = () => {
     let that = this
     setTimeout(() => {
@@ -87,12 +89,12 @@ class Index extends Component {
       }
     })
   }
+  // 查询数据
   handleSubmit = e => {
     e.preventDefault();
     let that = this;
     that.props.form.validateFields((err, values) => {
       if (!err) {
-        debugger
         const data = values.date
         that.setState({
           status: values.status,
@@ -107,6 +109,7 @@ class Index extends Component {
       }
     });
   }
+  // 分页
   getPagination = (pagination) => {
     console.log(pagination)
   }
@@ -114,6 +117,24 @@ class Index extends Component {
     this.getData()
     this.getCourseSelectList()
     this.getModalData()
+  }
+  // 考试
+  exam = (e, record) => {
+    e.preventDefault();
+    let that = this;
+    let { history } = that.props
+
+    const { courseId, paperId, paperType, userId } = record
+    $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
+      const {
+        code,
+        data
+      } = res.data
+      if (code === 0) {
+        history.push({ pathname: '/question', state: { 'questionData': data, ...record } })
+        localStorage.setItem('/question', JSON.stringify({ 'questionData': data, ...record }))
+      }
+    })
   }
   render () {
     const layout = {
@@ -214,7 +235,7 @@ class Index extends Component {
                 <span>
                   <a href='#'>查看</a>
                   <Divider type="vertical" />
-                  <a href='#'>重做</a>
+                  <a href='#' onClick={(e) => this.exam(e, record)}>考试</a>
                 </span>
               )}
             />
@@ -239,4 +260,4 @@ class Index extends Component {
   }
 }
 
-export default Form.create()(Index);
+export default withRouter(Form.create()(Index));

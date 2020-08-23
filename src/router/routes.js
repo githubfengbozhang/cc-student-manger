@@ -3,6 +3,7 @@ import MyClass from '../views/myClasses/Index';
 import ClassData from '../views/classData/Index';
 import StudyRoom from '../views/studyRoom/Index';
 import Task from '../views/task/Index';
+import Question from '../views/Question/Index';
 import Icon from '../views/icon/Index';
 import Error404 from '../views/error/Error404';
 import Error500 from '../views/error/Error500';
@@ -33,6 +34,7 @@ export const routes = [
   { path: '/classData', component: ClassData },
   { path: '/studyRoom', component: StudyRoom },
   { path: '/task', component: Task },
+  { path: '/question', component: Question },
   { path: '/icon', component: Icon },
   { path: '/form/basic', component: BasicForm },
   { path: '/form/editor', component: Editor },

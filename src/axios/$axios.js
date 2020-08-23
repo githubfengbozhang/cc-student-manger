@@ -10,7 +10,7 @@ const $axios = axios.create({
 });
 const fillterData = function (data) {
   const fillter = JSON.stringify(data, (key, value) => {
-    if (!value) {
+    if (value === null || value === "" || value === undefined) {
       return undefined;
     }
     return value;

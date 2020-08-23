@@ -35,7 +35,7 @@ class SideNenu extends Component {
   // 递归渲染菜单
   renderMenu = data => {
     return data.map(item => {
-      if (item.children) {
+      if (item.children && !item.hidden) {
         return (
           this.handleFilter(item.permission) && (
             <SubMenu
@@ -53,7 +53,7 @@ class SideNenu extends Component {
         );
       }
       return (
-        this.handleFilter(item.permission) && (
+        (this.handleFilter(item.permission)) && (
           <Menu.Item key={item.path}>
             <Link to={item.path} onClick={() => this.handClickTag(item)}>
               {item.icon ? <Icon type={item.icon} /> : ''}
