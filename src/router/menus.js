@@ -21,6 +21,14 @@ export const menus = [
     path: '/task',
     title: '任务',
     icon: 'snippets',
+    hidden: true,
+    children: [
+      {
+        path: '/question',
+        title: '考试',
+        hidden: true
+      },
+    ]
   },
   {
     path: '/classData',

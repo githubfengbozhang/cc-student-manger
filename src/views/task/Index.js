@@ -3,6 +3,7 @@ import { Select, Form, DatePicker, Button, Table, Divider, Modal } from 'antd';
 import './index.scss';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
+import { withRouter } from 'react-router-dom'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -26,6 +27,7 @@ class Index extends Component {
       modalData: {}
     };
   }
+  // 弹窗确定
   handleOk = () => {
     let that = this
     setTimeout(() => {
@@ -87,6 +89,7 @@ class Index extends Component {
       }
     })
   }
+  // 查询数据
   handleSubmit = e => {
     e.preventDefault();
     let that = this;
@@ -97,8 +100,8 @@ class Index extends Component {
           status: values.status,
           courseId: values.courseId,
           type: values.type,
-          beginTime: data[0].format('YYYY-MM-DD HH:mm:ss'),
-          endTime: data[1].format('YYYY-MM-DD HH:mm:ss'),
+          beginTime: `${data[0].format('YYYY-MM-DD')} 00:00:00`,
+          endTime: `${data[1].format('YYYY-MM-DD')} 23:59:59`,
         }, () => {
           that.getData()
         })
@@ -106,6 +109,7 @@ class Index extends Component {
       }
     });
   }
+  // 分页
   getPagination = (pagination) => {
     console.log(pagination)
   }
@@ -113,6 +117,24 @@ class Index extends Component {
     this.getData()
     this.getCourseSelectList()
     this.getModalData()
+  }
+  // 考试
+  exam = (e, record) => {
+    e.preventDefault();
+    let that = this;
+    let { history } = that.props
+
+    const { courseId, paperId, paperType, userId } = record
+    $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
+      const {
+        code,
+        data
+      } = res.data
+      if (code === 0) {
+        history.push({ pathname: '/question', state: { 'questionData': data, ...record } })
+        localStorage.setItem('/question', JSON.stringify({ 'questionData': data, ...record }))
+      }
+    })
   }
   render () {
     const layout = {
@@ -142,7 +164,7 @@ class Index extends Component {
             <FormItem label="时间" name="size">
               {
                 getFieldDecorator('date')(
-                  <RangePicker onChange={() => this.onChangeRangePicker} />
+                  <RangePicker />
                 )
               }
 
@@ -194,6 +216,17 @@ class Index extends Component {
                 }
               }}
             />
+            <Column title="任务类型" dataIndex="paperType" key="paperType"
+              render={(text, record) => {
+                if (record.paperType * 1 === 0) {
+                  return '考试'
+                } else if (record.paperType * 1 === 1) {
+                  return '作业测试'
+                } else {
+                  return '-'
+                }
+              }}
+            />
             <Column
               title="操作"
               key="action"
@@ -202,7 +235,7 @@ class Index extends Component {
                 <span>
                   <a href='#'>查看</a>
                   <Divider type="vertical" />
-                  <a href='#'>重做</a>
+                  <a href='#' onClick={(e) => this.exam(e, record)}>考试</a>
                 </span>
               )}
             />
@@ -227,4 +260,4 @@ class Index extends Component {
   }
 }
 
-export default Form.create()(Index);
+export default withRouter(Form.create()(Index));
