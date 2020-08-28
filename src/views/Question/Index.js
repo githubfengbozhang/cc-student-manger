@@ -223,7 +223,7 @@ class Index extends Component {
                   </div>
                   <div className="exam-btn">
                     <Button type="primary" size="large" disabled={questionSqNo === 0} className="mr-20">上一题</Button>
-                    <Button type="primary" size="large" onClick={(e) => this.next(e)}>下一题</Button>
+        <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.questionData.length === this.state.questionSqNo+1?"提交":"下一题"}</Button>
                   </div>
                 </div>
                 <div>距离本次测试结束还有<span className="exam-time">00:20:00</span>小时</div>
