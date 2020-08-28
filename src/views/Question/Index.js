@@ -25,14 +25,13 @@ const Question = (props) => {
       <Form onSubmit={() => props.handleSubmit()}>
         <Form.Item>
           {
-            getFieldDecorator("radio")(
+            getFieldDecorator("answer")(
               <Radio.Group >
                 {
-                  Object.keys(questionItem).map((key) => {
-                    <Radio style={radioStyle} value={questionItem[key]} key={key}>
-                      {key}
+                  Object.keys(questionItem).map((key) =>
+                    <Radio style={radioStyle} value={key} key={key}>
+                      {questionItem[key]}
                     </Radio>
-                  }
                   )
                 }
               </Radio.Group>
@@ -41,38 +40,26 @@ const Question = (props) => {
 
         </Form.Item>
       </Form>
-
-      // <Radio.Group onChange={() => props.querstionOnChange()} >
-      //   {
-      //     Object.keys(questionItem).map((key) =>
-      //       <Radio style={radioStyle} value={questionItem[key]} key={key}>
-      //         {key}
-      //       </Radio>
-      //     )
-      //   }
-      // </Radio.Group>
     )
   } else if (questionType === "1") { // 多选
     return (
-      <Checkbox.Group style={{ width: '100%' }} onChange={() => props.querstionOnChange()}>
-        <Row>
-          <Col span={8}>
-            <Checkbox value="A">A</Checkbox>
-          </Col>
-          <Col span={8}>
-            <Checkbox value="B">B</Checkbox>
-          </Col>
-          <Col span={8}>
-            <Checkbox value="C">C</Checkbox>
-          </Col>
-          <Col span={8}>
-            <Checkbox value="D">D</Checkbox>
-          </Col>
-          <Col span={8}>
-            <Checkbox value="E">E</Checkbox>
-          </Col>
-        </Row>
-      </Checkbox.Group>
+      <Form onSubmit={() => props.handleSubmit()}>
+        <Form.Item>
+          {
+            getFieldDecorator("answer")(
+              <Checkbox.Group style={{ width: '100%' }} onChange={() => props.querstionOnChange()}>
+                {
+                  Object.keys(questionItem).map((key) =>
+                    <Col span={8}>
+                      <Checkbox style={radioStyle} value={key} key={key}>{questionItem[key]}</Checkbox>
+                    </Col>
+                  )
+                }
+              </Checkbox.Group>
+            )
+          }
+        </Form.Item>
+      </Form>
     )
   } else if (questionType === "3") {// 填空
     const formItemLayout = {
@@ -92,7 +79,7 @@ const Question = (props) => {
           Object.keys(questionItem).map((key) =>
             <Form.Item label={key}>
               {
-                getFieldDecorator(`name${key}`)(<Input />)
+                getFieldDecorator("answer")(<Input />)
               }
 
             </Form.Item>
@@ -117,22 +104,20 @@ class Index extends Component {
       questionTitle: '',
       easyScaleName: '',
       questionType: '',
-      questionSqNo: 1
+      questionSqNo: 0
     }
   }
   // 获取题
-  getQuestion = () => {
+  getQuestion = (questionSqNo) => {
     let that = this;
-    debugger
     const { questionData, courseId, paperId, paperType } = this.props.location.state;
-    const questionId = Object.keys(questionData[0])[0]
+    const questionId = Object.keys(questionData[questionSqNo])[0]
     $axios.post("/exam/api/student/question/queryQuerstionByQuestionId", qs.stringify({ questionId, courseId, paperId, paperType })).then((res) => {
       const {
         code,
         data
       } = res.data
       if (code === 0) {
-        debugger
         const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType } = data
         setTimeout(() => {
           that.setState({
@@ -155,7 +140,7 @@ class Index extends Component {
     }
     this.setState({
       questionData: this.props.location.state.questionData
-    }, () => this.getQuestion())
+    }, () => this.getQuestion(this.state.questionSqNo))
 
   }
   componentWillUnmount () {
@@ -172,7 +157,9 @@ class Index extends Component {
     console.log(1312)
   }
   next = (e) => {
-    debugger
+    if (this.state.questionData.length === this.state.questionSqNo) {
+      return
+    }
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -190,19 +177,30 @@ class Index extends Component {
 
   }
   axiosCommitQuestion = (values) => {
-    debugger
     const { courseId, paperId, paperType } = this.props.location.state;
-    const questionId = this.state.questionData[this.state.questionSqNo]
+    const questionObject = this.state.questionData[this.state.questionSqNo - 1]
+    const questionId = Object.keys(questionObject)[0]
+    let answer = values.answer
+    if (values.answer instanceof Array) {
+      answer = values.answer.join(',')
+    }
     const query = {
       answerFlag: 1,
-      answerResult: '',
+      answerResult: answer,
       courseId,
       paperId,
       paperType,
       questionId,
     }
     $axios.post("/exam/api/student/answer/saveAnswer", qs.stringify(query)).then((res) => {
-      // todo
+      const { code } = res.data
+      if (code === 0) {
+        this.props.form.setFieldsValue({
+          answer: '',
+        });
+        this.getQuestion(this.state.questionSqNo)
+      }
+
     })
   }
   render () {
@@ -212,7 +210,6 @@ class Index extends Component {
       layout: 'inline'
     };
     const { questionData, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo } = this.state
-    debugger
     return (
       <div>
         {
@@ -220,12 +217,12 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{questionData.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo + 1}/{questionData.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
                     <Question questionItem={questionItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
                   <div className="exam-btn">
-                    <Button type="primary" size="large" disabled={questionSqNo === 1} className="mr-20">上一题</Button>
+                    <Button type="primary" size="large" disabled={questionSqNo === 0} className="mr-20">上一题</Button>
                     <Button type="primary" size="large" onClick={(e) => this.next(e)}>下一题</Button>
                   </div>
                 </div>
