@@ -7,7 +7,7 @@ import qs from 'qs';
 import $axios from "@/axios/$axios";
 import './index.scss'
 import { withRouter } from 'react-router-dom'
-
+import showtime from "../../utils/countdown.js"
 
 const Question = (props) => {
   let that = this
@@ -97,7 +97,7 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      questionData: [],
+      examSort: [],
       questionItem: {},
       questionId: '',
       questionTypeName: '',
@@ -110,8 +110,8 @@ class Index extends Component {
   // 获取题
   getQuestion = (questionSqNo) => {
     let that = this;
-    const { questionData, courseId, paperId, paperType } = this.props.location.state;
-    const questionId = Object.keys(questionData[questionSqNo])[0]
+    const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
+    const questionId = Object.keys(examSort[questionSqNo])[0]
     $axios.post("/exam/api/student/question/queryQuerstionByQuestionId", qs.stringify({ questionId, courseId, paperId, paperType })).then((res) => {
       const {
         code,
@@ -139,9 +139,22 @@ class Index extends Component {
       this.props.location.state = localStorage.getItem("/question") && JSON.parse(localStorage.getItem("/question"))
     }
     this.setState({
-      questionData: this.props.location.state.questionData
+      examSort: this.props.location.state.questionData.examSort
     }, () => this.getQuestion(this.state.questionSqNo))
-
+    let that = this
+    const { systemTime, examEndTime } = this.props.location.state.questionData
+    let time = new Date(systemTime) - new Date(examEndTime)
+    setInterval(function () {
+      if (that.refs.countDown) {
+        that.refs.countDown.innerHTML = showtime(time)
+        time = time - 1000
+        if (that.refs.countDown.innerHTML === "00小时:00分钟:00秒") {
+          Toast.success('考试已结束，即将退出！', 2, () => {
+            history.push({ pathname: '/PhoneQuestion' })
+          });
+        }
+      }
+    }, 1000);
   }
   componentWillUnmount () {
     // 销毁拦截判断是否离开当前页面
@@ -157,7 +170,7 @@ class Index extends Component {
     console.log(1312)
   }
   next = (e) => {
-    if (this.state.questionData.length === this.state.questionSqNo) {
+    if (this.state.examSort.length === this.state.questionSqNo) {
       return
     }
     e.preventDefault();
@@ -178,7 +191,7 @@ class Index extends Component {
   }
   axiosCommitQuestion = (values) => {
     const { courseId, paperId, paperType } = this.props.location.state;
-    const questionObject = this.state.questionData[this.state.questionSqNo - 1]
+    const questionObject = this.state.examSort[this.state.questionSqNo - 1]
     const questionId = Object.keys(questionObject)[0]
     let answer = values.answer
     if (values.answer instanceof Array) {
@@ -209,7 +222,7 @@ class Index extends Component {
       wrapperCol: { span: 16 },
       layout: 'inline'
     };
-    const { questionData, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo } = this.state
+    const { examSort, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo } = this.state
     return (
       <div>
         {
@@ -217,7 +230,7 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo + 1}/{questionData.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo + 1}/{examSort.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
                     <Question questionItem={questionItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
@@ -226,7 +239,7 @@ class Index extends Component {
                     <Button type="primary" size="large" onClick={(e) => this.next(e)}>下一题</Button>
                   </div>
                 </div>
-                <div>距离本次测试结束还有<span className="exam-time">00:20:00</span>小时</div>
+                <div>距离本次测试结束还有<span className="exam-time" ref="countDown">00:00:00</span></div>
               </div>
 
             </div>

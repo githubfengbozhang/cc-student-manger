@@ -32,8 +32,7 @@ class Index extends Component {
         code,
         data
       } = res.data
-      if (code === 0 && data.length > 0) {
-        debugger
+      if (code === 0 && data.examSort.length > 0) {
         history.push({ pathname: '/PhoneQuestion', state: { 'questionData': data, ...record } })
         localStorage.setItem('/PhoneQuestion', JSON.stringify({ 'questionData': data, ...record }))
       }
