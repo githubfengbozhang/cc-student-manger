@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import React, { Component } from 'react';
-import { Button, Radio, Checkbox, Row, Col, Input, Form,Modal } from 'antd';
+import { Button, Radio, Checkbox, Row, Col, Input, Form, Modal, notification } from 'antd';
 import TypingCard from '../../components/TypingCard';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
@@ -105,8 +105,8 @@ class Index extends Component {
       easyScaleName: '',
       questionType: '',
       questionSqNo: 0,
-      systemTime:'',
-      examEndTime:''
+      systemTime: '',
+      examEndTime: ''
     }
   }
   // 获取题
@@ -120,7 +120,14 @@ class Index extends Component {
         data
       } = res.data
       if (code === 0) {
-        const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType } = data
+        const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, ansItem } = data
+
+        if (questionType === "0" || questionType === "2") {
+          const answer = Object.keys(ansItem)
+          this.props.form.setFieldsValue({
+            answer,
+          });
+        }
         setTimeout(() => {
           that.setState({
             questionItem,
@@ -168,8 +175,8 @@ class Index extends Component {
     this.setState({
       examSort: this.props.location.state.questionData.examSort
     }, () => this.getQuestion(this.state.questionSqNo))
-    const {courseId, paperId, paperType, userId} = this.props.location.state
-    this.exam({courseId, paperId, paperType, userId})
+    const { courseId, paperId, paperType, userId } = this.props.location.state
+    this.exam({ courseId, paperId, paperType, userId })
   }
   componentWillUnmount () {
     // 销毁拦截判断是否离开当前页面
@@ -184,13 +191,39 @@ class Index extends Component {
   querstionOnChange = () => {
     console.log(1312)
   }
+  // 下一道提
   next = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        if (!values.answer || values.answer.length === 0) {
+          notification['info']({
+            message: '温馨提示！',
+            description:
+              '亲爱的同学请做完本题后，再进行下一题进行作答。',
+          });
+          return
+        }
         this.commitQuestion(values)
       }
     });
+  }
+  // 上一道题
+  previous = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.commitPreviousQuestion(values)
+      }
+    });
+  }
+  // 查看上一步提交的答案
+  commitPreviousQuestion = (values) => {
+    this.setState({
+      questionSqNo: this.state.questionSqNo - 1
+    }, () => {
+      this.getQuestion(this.state.questionSqNo)
+    })
   }
   // 下一步提交答案
   commitQuestion = (values) => {
@@ -202,7 +235,7 @@ class Index extends Component {
 
   }
   // 提交答案的接口请求
-  axiosCommitQuestion = (values) => {
+  axiosCommitQuestion = (values, type) => {
     const { courseId, paperId, paperType } = this.props.location.state;
     const questionObject = this.state.examSort[this.state.questionSqNo - 1]
     const questionId = Object.keys(questionObject)[0]
@@ -222,7 +255,7 @@ class Index extends Component {
       const { code } = res.data
       if (code === 0) {
         // 考试完毕
-        if(this.state.questionSqNo === this.state.examSort.length){
+        if (this.state.questionSqNo === this.state.examSort.length) {
           this.info('您已考试完毕,请返回列表!')
           return
         }
@@ -234,13 +267,13 @@ class Index extends Component {
 
     })
   }
-   // 弹窗提示
-   info = (msg) => {
+  // 弹窗提示
+  info = (msg) => {
     let { history } = that.props
     Modal.info({
       content: msg,
-      onOk(){
-        history.push({ pathname: '/task'})
+      onOk () {
+        history.push({ pathname: '/task' })
       }
     });
   }
@@ -263,8 +296,8 @@ class Index extends Component {
                     <Question questionItem={questionItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
                   <div className="exam-btn">
-                    <Button type="primary" size="large" disabled={questionSqNo === 0} className="mr-20">上一题</Button>
-        <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.questionData.length === this.state.questionSqNo+1?"提交":"下一题"}</Button>
+                    <Button type="primary" size="large" disabled={questionSqNo === 0} className="mr-20" onClick={(e) => this.previous(e)}>上一题</Button>
+                    <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.examSort.length === this.state.questionSqNo + 1 ? "提交" : "下一题"}</Button>
                   </div>
                 </div>
                 <div>距离本次测试结束还有<span className="exam-time" ref="countDown">00:00:00</span></div>

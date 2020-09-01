@@ -28,15 +28,23 @@ class Index extends Component {
     };
   }
   // 弹窗确定
-  handleOk = () => {
+  handleOk = (e, modalData) => {
     let that = this
     setTimeout(() => {
       that.setState({
         visible: false,
+      }, () => {
+        that.exam(e, modalData)
       });
     })
-
   };
+  handleCall = () => {
+    setTimeout(() => {
+      this.setState({
+        visible: false,
+      });
+    })
+  }
   onChangeRangePicker = (data) => {
   }
   // 获取列表数据
@@ -120,6 +128,7 @@ class Index extends Component {
   }
   // 考试
   exam = (e, record) => {
+    debugger
     e.preventDefault();
     let that = this;
     let { history } = that.props
@@ -131,6 +140,9 @@ class Index extends Component {
         data
       } = res.data
       if (code === 0) {
+        if (data.examSort.length === 0) {
+          return
+        }
         history.push({ pathname: '/question', state: { 'questionData': data, ...record } })
         localStorage.setItem('/question', JSON.stringify({ 'questionData': data, ...record }))
       }
@@ -246,8 +258,8 @@ class Index extends Component {
             <Modal
               title="任务提醒"
               visible={visible}
-              onOk={this.handleOk}
-              onCancel={this.handleOk}
+              onOk={(e) => this.handleOk(e, modalData)}
+              onCancel={this.handleCall}
               cancelText="稍后处理"
               okText="立即前往"
               maskClosable={false}
