@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import React, { Component } from 'react';
-import { Button, Radio, Checkbox, Row, Col, Input, Form } from 'antd';
+import { Button, Radio, Checkbox, Row, Col, Input, Form,Modal } from 'antd';
 import TypingCard from '../../components/TypingCard';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
@@ -104,7 +104,9 @@ class Index extends Component {
       questionTitle: '',
       easyScaleName: '',
       questionType: '',
-      questionSqNo: 0
+      questionSqNo: 0,
+      systemTime:'',
+      examEndTime:''
     }
   }
   // 获取题
@@ -132,6 +134,31 @@ class Index extends Component {
       }
     })
   }
+  // 考试
+  exam = (record) => {
+    let that = this;
+    const { courseId, paperId, paperType, userId } = record
+    $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
+      const {
+        code,
+        data
+      } = res.data
+      if (code === 0) {
+        const { systemTime, examEndTime } = data
+        let time = new Date(systemTime) - new Date(examEndTime)
+        setInterval(function () {
+          if (that.refs.countDown) {
+            that.refs.countDown.innerHTML = showtime(time)
+            time = time - 1000
+            if (that.refs.countDown.innerHTML === "00小时:00分钟:00秒") {
+              this.info('考试时间已结束,请返回列表!')
+              return
+            }
+          }
+        }, 1000);
+      }
+    })
+  }
   componentWillMount () {
     // 拦截判断是否离开当前页面
     window.addEventListener('beforeunload', this.beforeunload);
@@ -141,20 +168,8 @@ class Index extends Component {
     this.setState({
       examSort: this.props.location.state.questionData.examSort
     }, () => this.getQuestion(this.state.questionSqNo))
-    let that = this
-    const { systemTime, examEndTime } = this.props.location.state.questionData
-    let time = new Date(systemTime) - new Date(examEndTime)
-    setInterval(function () {
-      if (that.refs.countDown) {
-        that.refs.countDown.innerHTML = showtime(time)
-        time = time - 1000
-        if (that.refs.countDown.innerHTML === "00小时:00分钟:00秒") {
-          Toast.success('考试已结束，即将退出！', 2, () => {
-            history.push({ pathname: '/PhoneQuestion' })
-          });
-        }
-      }
-    }, 1000);
+    const {courseId, paperId, paperType, userId} = this.props.location.state
+    this.exam({courseId, paperId, paperType, userId})
   }
   componentWillUnmount () {
     // 销毁拦截判断是否离开当前页面
@@ -170,9 +185,6 @@ class Index extends Component {
     console.log(1312)
   }
   next = (e) => {
-    if (this.state.examSort.length === this.state.questionSqNo) {
-      return
-    }
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -189,6 +201,7 @@ class Index extends Component {
     })
 
   }
+  // 提交答案的接口请求
   axiosCommitQuestion = (values) => {
     const { courseId, paperId, paperType } = this.props.location.state;
     const questionObject = this.state.examSort[this.state.questionSqNo - 1]
@@ -208,6 +221,11 @@ class Index extends Component {
     $axios.post("/exam/api/student/answer/saveAnswer", qs.stringify(query)).then((res) => {
       const { code } = res.data
       if (code === 0) {
+        // 考试完毕
+        if(this.state.questionSqNo === this.state.examSort.length){
+          this.info('您已考试完毕,请返回列表!')
+          return
+        }
         this.props.form.setFieldsValue({
           answer: '',
         });
@@ -215,6 +233,16 @@ class Index extends Component {
       }
 
     })
+  }
+   // 弹窗提示
+   info = (msg) => {
+    let { history } = that.props
+    Modal.info({
+      content: msg,
+      onOk(){
+        history.push({ pathname: '/task'})
+      }
+    });
   }
   render () {
     const layout = {
