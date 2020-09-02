@@ -9,8 +9,6 @@ import './index.scss'
 import { withRouter } from 'react-router-dom'
 import showtime from "../../utils/countdown.js"
 
-const [modal] = Modal.useModal();
-
 const Question = (props) => {
   let that = this
   const radioStyle = {
@@ -20,14 +18,16 @@ const Question = (props) => {
   };
 
 
-  const { questionItem, questionType } = props
+  const { questionItem, questionType, ansItem } = props
   const { getFieldDecorator } = props.form;
   if (questionType === "0" || questionType === "2") {// 单选和判断
     return (
       <Form onSubmit={() => props.handleSubmit()}>
         <Form.Item>
           {
-            getFieldDecorator("answer")(
+            getFieldDecorator("answer", {
+              initialValue: Object.keys(ansItem)[0] ? Object.keys(ansItem)[0] : ''
+            })(
               <Radio.Group >
                 {
                   Object.keys(questionItem).map((key) =>
@@ -48,11 +48,14 @@ const Question = (props) => {
       <Form onSubmit={() => props.handleSubmit()}>
         <Form.Item>
           {
-            getFieldDecorator("answer")(
+
+            getFieldDecorator("answer", {
+              initialValue: Object.keys(ansItem) ? Object.keys(ansItem) : ''
+            })(
               <Checkbox.Group style={{ width: '100%' }} onChange={() => props.querstionOnChange()}>
                 {
                   Object.keys(questionItem).map((key) =>
-                    <Col span={8}>
+                    <Col span={8} key={key}>
                       <Checkbox style={radioStyle} value={key} key={key}>{questionItem[key]}</Checkbox>
                     </Col>
                   )
@@ -78,10 +81,12 @@ const Question = (props) => {
 
       <Form {...formItemLayout} onSubmit={() => props.handleSubmit()}>
         {
-          Object.keys(questionItem).map((key) =>
-            <Form.Item label={key}>
+          Object.keys(questionItem).map((key, index) =>
+            <Form.Item label={key} key={index}>
               {
-                getFieldDecorator("answer")(<Input />)
+                getFieldDecorator(`answer[${index}]`, {
+                  initialValue: ansItem[key] ? ansItem[key] : ''
+                })(<Input />)
               }
 
             </Form.Item>
@@ -99,7 +104,7 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ansItem:'', //答案
+      ansItem: '', //答案
       examSort: [], // 题目序号{key:value}
       questionItem: {},
       questionId: '', // 题目id
@@ -107,7 +112,7 @@ class Index extends Component {
       questionTitle: '', // 题目标题
       easyScaleName: '', // 难易程度
       questionType: '', // 难易程度类型
-      questionSqNo: 0, // 题目显示的SqNo
+      questionSqNo: 1, // 题目显示的SqNo
       systemTime: '', // 系统时间
       examEndTime: '' // 考试结束时间
     }
@@ -116,7 +121,7 @@ class Index extends Component {
   getQuestion = (questionSqNo) => {
     let that = this;
     const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
-    const questionId = Object.keys(examSort[questionSqNo])[0]
+    const questionId = Object.keys(examSort[questionSqNo - 1])[0]
     $axios.post("/exam/api/student/question/queryQuerstionByQuestionId", qs.stringify({ questionId, courseId, paperId, paperType })).then((res) => {
       const {
         code,
@@ -126,12 +131,15 @@ class Index extends Component {
         const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, ansItem } = data
         // 单选和判断
         if (questionType === "0" || questionType === "2") {
+          const answer = Object.keys(ansItem)[0]
+          this.props.form.setFieldsValue({
+            answer: answer,
+          });
+        } else if (questionType === "1" || questionType === "3") { //多选和填空
           const answer = Object.keys(ansItem)
           this.props.form.setFieldsValue({
-            answer,
+            answer: answer,
           });
-        }else{ //多选和填空
-
         }
         setTimeout(() => {
           that.setState({
@@ -140,7 +148,8 @@ class Index extends Component {
             questionTypeName,
             questionTitle,
             easyScaleName,
-            questionType
+            questionType,
+            ansItem
           })
         }, 300);
       }
@@ -218,14 +227,10 @@ class Index extends Component {
   // 上一道题
   previous = (e) => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        this.commitPreviousQuestion(values)
-      }
-    });
+    this.commitPreviousQuestion()
   }
   // 查看上一步提交的答案
-  commitPreviousQuestion = (values) => {
+  commitPreviousQuestion = () => {
     this.setState({
       questionSqNo: this.state.questionSqNo - 1
     }, () => {
@@ -234,22 +239,22 @@ class Index extends Component {
   }
   // 下一步提交答案
   commitQuestion = (values) => {
-    this.setState({
-      questionSqNo: this.state.questionSqNo + 1
-    }, () => {
-      this.axiosCommitQuestion(values)
-    })
-
+    // this.setState({
+    //   questionSqNo: this.state.questionSqNo + 1
+    // }, () => {
+    // this.axiosCommitQuestion(values)
+    // })
+    this.axiosCommitQuestion(values)
   }
   // 提交答案的接口请求
   axiosCommitQuestion = (values, type) => {
     const { courseId, paperId, paperType } = this.props.location.state;
     const questionObject = this.state.examSort[this.state.questionSqNo - 1]
     const questionId = Object.keys(questionObject)[0]
-    let answer = values.answer
-    if (values.answer instanceof Array) {
-      answer = values.answer.join(',')
-    }
+    let answer = this.answerType(values.answer)
+    // if (values.answer instanceof Array) {
+    //   answer = values.answer.join(',')
+    // }
     const query = {
       answerFlag: 1,
       answerResult: answer,
@@ -270,14 +275,36 @@ class Index extends Component {
         this.props.form.setFieldsValue({
           answer: '',
         });
-        this.getQuestion(this.state.questionSqNo)
+        this.setState({
+          questionSqNo: this.state.questionSqNo + 1
+        }, () => {
+          this.getQuestion(this.state.questionSqNo)
+        })
+
       }
 
     })
   }
+  answerType = (answer) => {
+    // 单选或者判断
+    const { questionType, questionItem } = this.state
+    if (questionType * 1 === 0 || questionType * 1 === 2) {
+      return answer;
+    } else if (questionType * 1 === 1) { // 多选
+      return answer.join('');
+    } else if (questionType * 1 === 3) { //填空
+      const keys = Object.keys(questionItem)
+      let array = []
+      keys.map((item, index) => {
+        let string = `${item}=${answer[index]}`
+        array.push(string)
+      })
+      return array.join("###")
+    }
+  }
   // 弹窗提示
   info = (msg) => {
-    let { history } = that.props
+    let { history } = this.props
     Modal.info({
       content: msg,
       onOk () {
@@ -291,7 +318,7 @@ class Index extends Component {
       wrapperCol: { span: 16 },
       layout: 'inline'
     };
-    const { examSort, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo } = this.state
+    const { examSort, questionItem, questionId, questionTypeName, ansItem, questionTitle, easyScaleName, questionType, questionSqNo } = this.state
     return (
       <div>
         {
@@ -299,13 +326,13 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo + 1}/{examSort.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
-                    <Question questionItem={questionItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
+                    <Question questionItem={questionItem} ansItem={ansItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
                   <div className="exam-btn">
-                    <Button type="primary" size="large" disabled={questionSqNo === 0} className="mr-20" onClick={(e) => this.previous(e)}>上一题</Button>
-                    <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.examSort.length === this.state.questionSqNo + 1 ? "提交" : "下一题"}</Button>
+                    <Button type="primary" size="large" disabled={questionSqNo === 1} className="mr-20" onClick={(e) => this.previous(e)}>上一题</Button>
+                    <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.examSort.length === this.state.questionSqNo ? "提交" : "下一题"}</Button>
                   </div>
                 </div>
                 <div>距离本次测试结束还有<span className="exam-time" ref="countDown">00:00:00</span></div>

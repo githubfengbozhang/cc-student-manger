@@ -96,6 +96,7 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      ansItem: '', //答案
       examSort: [],
       questionItem: {},
       questionId: '',
@@ -121,7 +122,16 @@ class Index extends Component {
         data
       } = res.data
       if (code === 0) {
-        const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType } = data
+        const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, ansItem } = data
+        // 单选和判断
+        if (questionType === "0" || questionType === "2") {
+          const answer = Object.keys(ansItem)
+          this.props.form.setFieldsValue({
+            answer,
+          });
+        } else { //多选和填空
+
+        }
         setTimeout(() => {
           that.setState({
             questionItem,
@@ -129,7 +139,8 @@ class Index extends Component {
             questionTypeName,
             questionTitle,
             easyScaleName,
-            questionType
+            questionType,
+            ansItem
           })
         }, 300);
       }
@@ -189,9 +200,21 @@ class Index extends Component {
       })
     }
   }
+  // 上一道题
+  previous = (e) => {
+    e.preventDefault();
+    this.commitPreviousQuestion()
+  }
+  // 查看上一步提交的答案
+  commitPreviousQuestion = () => {
+    this.setState({
+      questionSqNo: this.state.questionSqNo - 1
+    }, () => {
+      this.getQuestion(this.state.questionSqNo)
+    })
+  }
   // 下步
   next = (e) => {
-
     e.preventDefault();
     if (this.state.answer) {
       let array = ''
@@ -281,7 +304,7 @@ class Index extends Component {
           </div>
           <WhiteSpace size="xl" />
           <div>
-            <Button type="primary" inline size="large" disabled={questionSqNo === 0} className="mr-20">上一题</Button>
+            <Button type="primary" inline size="large" disabled={questionSqNo === 0} onClick={(e) => this.previous(e)} className="mr-20">上一题</Button>
             <Button type="primary" inline size="large" onClick={(e) => this.next(e)}>{examSort.length === (questionSqNo + 1) ? "完成" : "下一题"}</Button>
           </div>
         </WingBlank>
