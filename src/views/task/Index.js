@@ -128,7 +128,6 @@ class Index extends Component {
   }
   // 考试
   exam = (e, record) => {
-    debugger
     e.preventDefault();
     let that = this;
     let { history } = that.props
