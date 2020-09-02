@@ -9,6 +9,8 @@ import './index.scss'
 import { withRouter } from 'react-router-dom'
 import showtime from "../../utils/countdown.js"
 
+const [modal] = Modal.useModal();
+
 const Question = (props) => {
   let that = this
   const radioStyle = {
@@ -97,16 +99,17 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      examSort: [],
+      ansItem:'', //答案
+      examSort: [], // 题目序号{key:value}
       questionItem: {},
-      questionId: '',
-      questionTypeName: '',
-      questionTitle: '',
-      easyScaleName: '',
-      questionType: '',
-      questionSqNo: 0,
-      systemTime: '',
-      examEndTime: ''
+      questionId: '', // 题目id
+      questionTypeName: '', // 题目类型名称
+      questionTitle: '', // 题目标题
+      easyScaleName: '', // 难易程度
+      questionType: '', // 难易程度类型
+      questionSqNo: 0, // 题目显示的SqNo
+      systemTime: '', // 系统时间
+      examEndTime: '' // 考试结束时间
     }
   }
   // 获取题
@@ -121,12 +124,14 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, ansItem } = data
-
+        // 单选和判断
         if (questionType === "0" || questionType === "2") {
           const answer = Object.keys(ansItem)
           this.props.form.setFieldsValue({
             answer,
           });
+        }else{ //多选和填空
+
         }
         setTimeout(() => {
           that.setState({
@@ -172,10 +177,12 @@ class Index extends Component {
     if (!this.props.location.state) {
       this.props.location.state = localStorage.getItem("/question") && JSON.parse(localStorage.getItem("/question"))
     }
+
     this.setState({
       examSort: this.props.location.state.questionData.examSort
     }, () => this.getQuestion(this.state.questionSqNo))
     const { courseId, paperId, paperType, userId } = this.props.location.state
+
     this.exam({ courseId, paperId, paperType, userId })
   }
   componentWillUnmount () {
@@ -259,6 +266,7 @@ class Index extends Component {
           this.info('您已考试完毕,请返回列表!')
           return
         }
+        // TODO 下一题的时候有答案情况下不应该被置空
         this.props.form.setFieldsValue({
           answer: '',
         });

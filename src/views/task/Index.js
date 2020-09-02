@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Select, Form, DatePicker, Button, Table, Divider, Modal } from 'antd';
+import { Select, Form, DatePicker, Button, Table, Divider, Modal,notification } from 'antd';
 import './index.scss';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
@@ -141,6 +141,11 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         if (data.examSort.length === 0) {
+          notification['info']({
+            message: '温馨提示！',
+            description:
+              '亲爱的同学,还未查询到相关的考试信息，请耐心等待或联系管理员。',
+          });
           return
         }
         history.push({ pathname: '/question', state: { 'questionData': data, ...record } })
