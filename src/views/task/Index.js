@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Select, Form, DatePicker, Button, Table, Divider, Modal,notification } from 'antd';
+import { Select, Form, DatePicker, Button, Table, Divider, Modal, notification } from 'antd';
 import './index.scss';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
@@ -156,8 +156,8 @@ class Index extends Component {
     e.preventDefault();
     let that = this;
     let { history } = that.props
-    history.push({ pathname: '/view', state: {  ...record } })
-    localStorage.setItem('/view', JSON.stringify({  ...record }))
+    history.push({ pathname: '/view', state: { ...record } })
+    localStorage.setItem('/view', JSON.stringify({ ...record }))
   }
   render () {
     const layout = {

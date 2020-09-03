@@ -27,6 +27,11 @@ export const menus = [
         path: '/question',
         title: '考试',
         hidden: true
+      },
+      {
+        path: '/view',
+        title: '查看',
+        hidden: true
       }
     ]
   },

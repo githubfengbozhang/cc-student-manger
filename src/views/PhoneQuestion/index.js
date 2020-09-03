@@ -15,8 +15,18 @@ const CheckboxItem = Checkbox.CheckboxItem;
 let selectValue = ''
 const Question = (props) => {
   let that = this
-  const { questionItem, questionType, getValue,ansItem } = props
+  const { questionItem, questionType, getValue, ansItem } = props
   const { getFieldDecorator, getFieldError, setFieldsValue } = props.form;
+  // 多选题赋值
+  let keys = []
+  let radioKey = ""
+  if (questionType * 1 === 1) {
+    keys = Object.keys(ansItem)
+  }
+  // 单选和判断赋值
+  else if (questionType === "0" || questionType === "2") {
+    radioKey = Object.keys(ansItem)[0]
+  }
 
   const onChangeCheckbox = (e, key) => {
     const value = {
@@ -43,8 +53,8 @@ const Question = (props) => {
       <div>
         <List>
           {
-            Object.keys(questionItem).map(key => (
-              <RadioItem key={key} checked={selectValue === key} onChange={(e) => onChangeRadio(e, key)}>
+            Object.keys(questionItem).map((key, index) => (
+              <RadioItem key={key} checked={radioKey === key} key={index} onChange={(e) => onChangeRadio(e, key)}>
                 {questionItem[key]}
               </RadioItem>
             ))
@@ -55,10 +65,11 @@ const Question = (props) => {
     )
   } else if (questionType === "1") { // 多选
     return (
+
       <div>
         {
-          Object.keys(questionItem).map(key => (
-            <CheckboxItem key={key} value={key} onChange={(e) => onChangeCheckbox(e, key)}>
+          Object.keys(questionItem).map((key, index) => (
+            <CheckboxItem key={key} value={key} key={index} checked={keys.indexOf(key) > -1} onChange={(e) => onChangeCheckbox(e, key)}>
               {questionItem[key]}
             </CheckboxItem>
           ))
@@ -80,15 +91,12 @@ const Question = (props) => {
     return (
       <div>
         {
-          getFieldDecorator("answer",{ initialValue: Object.keys(ansItem) ? Object.keys(ansItem) : ''})(
-            Object.keys(questionItem).map((key) =>
-            <div>
-            <InputItem label={key} {...getFieldDecorator(`answer[${key}]`)} placeholder="填写答案"
-              >{key}</InputItem>
-            </div>
-            )
+          Object.keys(questionItem).map((key, index) =>
+            getFieldDecorator(`answer[${index}]`, {
+              initialValue: ansItem[key] ? ansItem[key] : ''
+            })(<InputItem label={key} placeholder="填写答案" key={index}>{key}</InputItem>)
           )
-          
+
         }
       </div>
     )
@@ -129,7 +137,7 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         const { questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, ansItem } = data
-        
+
         setTimeout(() => {
           that.setState({
             questionItem,
@@ -184,17 +192,27 @@ class Index extends Component {
     const { checked, key, type } = value
     if (type === "checkbox") {
       if (checked) {
+        let newAnsItem = this.state.ansItem
+        newAnsItem[key] = key
         this.setState({
-          answer: [key, ...this.state.answer]
+          ansItem: newAnsItem
         })
       } else {
-        const index = this.state.answer.indexOf(key)
-        answer = answer.splice(index, 1)
+        const keysIndex = Object.keys(this.state.ansItem).indexOf(key)
+        let newAnsItem = {}
+        for (let i in this.state.ansItem) {
+          if (i + '' !== key) {
+            newAnsItem[i] = i
+          }
+        }
+        this.setState({
+          ansItem: newAnsItem
+        })
       }
 
     } else {
       this.setState({
-        answer: key
+        ansItem: key
       })
     }
   }
@@ -214,25 +232,30 @@ class Index extends Component {
   // 下步
   next = (e) => {
     e.preventDefault();
-    const {answer,questionType} = this.state
-    if (answer) {
-      let array = ''
-      if (questionType * 1 === 1) {
-        if (answer.length > 0) {
-          array = answer.filter((item, index, arr) => arr.indexOf(item) === index)
-        } else {
-          Toast.fail('请选或输入答案后继续答题', 1)
-        }
-        this.commitQuestion(array)
-      } else if(questionType * 1 === 0 || questionType * 1 === 2){
-        this.commitQuestion(answer)
-        selectValue = ''
-      }else if(questionType * 1 === 3){
-        this.props.form.get
-      }
+    const { ansItem, questionType } = this.state
 
-    } else {
-      Toast.fail('请选或输入答案后继续答题', 1)
+    let array = ''
+    if (questionType * 1 === 1) {
+      const keys = Object.keys(ansItem)
+      if (keys.length > 0) {
+        array = keys.filter((item, index, arr) => arr.indexOf(item) === index)
+      } else {
+        Toast.fail('请选或输入答案后继续答题', 1)
+      }
+      this.commitQuestion(array)
+    } else if (questionType * 1 === 0 || questionType * 1 === 2) {
+      if (!ansItem) {
+        Toast.fail('请选或输入答案后继续答题', 1)
+        return
+      }
+      this.commitQuestion(ansItem)
+      selectValue = ''
+    } else if (questionType * 1 === 3) {
+      if (this.props.form.getFieldValue("answer")) {
+        this.commitQuestion(ansItem)
+      } else {
+        Toast.fail('请选或输入答案后继续答题', 1)
+      }
     }
   }
   // 下一步提交答案
@@ -252,10 +275,9 @@ class Index extends Component {
     questionSqNo = questionSqNo + 1
 
     const questionId = Object.keys(questionObject)[0]
+
     let answer = this.answerType(values)
-    if (values instanceof Array) {
-      answer = values.join(',')
-    }
+
     const query = {
       answerFlag: 1,
       answerResult: answer,
@@ -284,11 +306,14 @@ class Index extends Component {
     })
   }
   answerType = (answer) => {
-    debugger
     // 单选或者判断
     const { questionType, questionItem } = this.state
     if (questionType * 1 === 0 || questionType * 1 === 2) {
-      return answer;
+      if (Object.keys(answer).length > 0) {
+        return Object.keys(answer)[0]
+      } else {
+        return answer;
+      }
     } else if (questionType * 1 === 1) { // 多选
       return answer.join('');
     } else if (questionType * 1 === 3) { //填空
@@ -307,7 +332,7 @@ class Index extends Component {
       wrapperCol: { span: 16 },
       layout: 'inline'
     };
-    const { examSort, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo,ansItem } = this.state
+    const { examSort, questionItem, questionId, questionTypeName, questionTitle, easyScaleName, questionType, questionSqNo, ansItem } = this.state
     return (
       <div className="question">
         <WhiteSpace size="xl" />
