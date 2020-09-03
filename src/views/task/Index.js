@@ -152,6 +152,13 @@ class Index extends Component {
       }
     })
   }
+  view = (e, record) => {
+    e.preventDefault();
+    let that = this;
+    let { history } = that.props
+    history.push({ pathname: '/view', state: {  ...record } })
+    localStorage.setItem('/view', JSON.stringify({  ...record }))
+  }
   render () {
     const layout = {
       labelCol: { span: 8 },
@@ -249,7 +256,7 @@ class Index extends Component {
               width={200}
               render={(text, record) => (
                 <span>
-                  <a href='#'>查看</a>
+                  <a href='#' onClick={(e) => this.view(e, record)}>查看</a>
                   <Divider type="vertical" />
                   <a href='#' onClick={(e) => this.exam(e, record)}>考试</a>
                 </span>
