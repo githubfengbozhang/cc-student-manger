@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Select, Form, Button, Radio } from 'antd';
-import TypingCard from '../../components/TypingCard'
-import './index.scss'
+import { Select, Form, Button } from 'antd';
+import TypingCard from '../../components/TypingCard';
+import qs from 'qs';
+import $axios from "@/axios/$axios";
+import './index.scss';
 
 const { Option } = Select;
 const FormItem = Form.Item
@@ -10,10 +12,27 @@ class Index extends Component {
     super();
     this.state = {
       hidden: true,
-      buttonDisabled: false
+      buttonDisabled: false,
+      courseSelectList:[]
     }
   }
-
+// 课程下拉数据
+  getCourseSelectList = () => {
+    let that = this;
+    let status = that.state.status
+    let courseId = that.state.courseId
+    $axios.post("/exam/api/student/course/queryCourseByUserId", qs.stringify({ status, courseId })).then((res) => {
+      const {
+        code,
+        data
+      } = res.data
+      if (code === 0) {
+        that.setState({
+          courseSelectList: data
+        })
+      }
+    })
+  }
   startExam = () => {
     let that = this
     setTimeout(() => {
@@ -23,9 +42,13 @@ class Index extends Component {
       })
     })
   }
+  componentDidMount () {
+    this.getCourseSelectList()
+  }
   componentWillMount () {
     // 拦截判断是否离开当前页面
     window.addEventListener('beforeunload', this.beforeunload);
+    
   }
   componentWillUnmount () {
     // 销毁拦截判断是否离开当前页面
@@ -43,32 +66,17 @@ class Index extends Component {
       layout: 'inline'
     };
     const cardContent = `请选择自测模式、课程、题库后,点击开始按钮进行自测`
-    const {  buttonDisabled } = this.state
+    const {  buttonDisabled,courseSelectList } = this.state
     return (
       <div>
         {
           <div className="shadow-radius" >
           <Form  {...layout} style={{ textAlign: "center" }}>
-            <FormItem label="模式" name="size">
-              <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择模式">
-                <Option value="全部">全部</Option>
-                <Option value="c++">c++</Option>
-                <Option value="jave">jave</Option>
-                <Option value="html">html</Option>
-              </Select>
-            </FormItem>
             <FormItem label="课程" name="class">
               <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择课程">
-                <Option value="JAVA">JAVA</Option>
-                <Option value="html">html</Option>
-                <Option value="Recat">Recat</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="题库" name="class">
-              <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择题库">
-                <Option value="全部">全部</Option>
-                <Option value="已结束">已结束</Option>
-                <Option value="学习中">学习中</Option>
+                {
+                  courseSelectList.map((item, key) => <Option value={item.courseId} key={key}>{item.courseName}</Option>)
+                }
               </Select>
             </FormItem>
           </Form>
