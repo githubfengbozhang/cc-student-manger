@@ -34,11 +34,12 @@ class Login extends Component {
             // 模拟生成一些数据
             this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: data.userName } }));
             localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: data.userName } })));
-            if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
-              this.props.history.push('/phoneExam');
-            } else {
-              this.props.history.push('/dashboard');
-            }
+            // if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+            //   this.props.history.push('/phoneExam');
+            // } else {
+            //   this.props.history.push('/dashboard');
+            // }
+            this.props.history.push('/dashboard');
           } else {
             setTimeout(() => {
               this.setState({
