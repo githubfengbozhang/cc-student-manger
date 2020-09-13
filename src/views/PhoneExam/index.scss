@@ -1,3 +1,8 @@
+@mixin paperType($color) {
+   margin-left: 30px;
+   color:$color
+}
+
 .bb-1{
   border-bottom: 1px solid rgba(128 ,128 ,128,0.5);
 }
@@ -7,4 +12,10 @@
 }
 .mt-10{
   margin-top: 10px;
+}
+.exam-class{
+  @include paperType(#00BCD4)
+}
+.task-class{
+  @include paperType(blue)
 }

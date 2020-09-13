@@ -4,7 +4,7 @@ import qs from 'qs';
 import $axios from "@/axios/$axios";
 // import { WingBlank, Picker, List, WhiteSpace } from 'antd-mobile';
 // import { createForm } from 'rc-form';
-import { PullToRefresh, WingBlank, WhiteSpace } from 'antd-mobile';
+import { PullToRefresh, WingBlank, WhiteSpace, Toast } from 'antd-mobile';
 import './index.scss'
 
 
@@ -16,7 +16,8 @@ class Index extends Component {
       down: true,
       height: document.documentElement.clientHeight,
       data: [],
-      pageNum: 0,
+      status: 0,
+      current: 0,
       pageSize: 10
     };
   }
@@ -33,6 +34,20 @@ class Index extends Component {
         data
       } = res.data
       if (code === 0 && data.examSort.length > 0) {
+        const examEndTime = new Date(data.examEndTime)
+        const systemTime = new Date(data.systemTime)
+        if (data.examSort.length === 0) {
+          Toast.offline('亲爱的同学,还未查询到相关的考试信息，请耐心等待或联系管理员。', 2)
+          return
+        }
+        if (examEndTime.getTime() < systemTime.getTime()) {
+          Toast.offline('亲爱的同学,考试已结束。', 2)
+          return
+        }
+        if (!systemTime || !examEndTime) {
+          Toast.offline('该考试信息的系统时间或考试结束时间错误，请及时联系管理员！', 2);
+          return
+        }
         history.push({ pathname: '/PhoneQuestion', state: { 'questionData': data, ...record } })
         localStorage.setItem('/PhoneQuestion', JSON.stringify({ 'questionData': data, ...record }))
       }
@@ -42,11 +57,11 @@ class Index extends Component {
   genData = () => {
     let that = this;
     let dataArr = this.state.data;
-    const { status, courseId, type, pageNum, pageSize } = that.state
+    const { status, courseId, type, pageSize, current } = that.state
     const param = {
-      pageNum: pageNum + 1
+      current: current + 1
     }
-    $axios.post("/exam/api/student/task/queryExamTaskByUserId", qs.stringify({ status, courseId, type, pageNum: param.pageNum, pageSize })).then((res) => {
+    $axios.post("/exam/api/student/task/queryExamTaskByUserId", qs.stringify({ status, courseId, type, current: param.current, pageSize })).then((res) => {
       const {
         code,
         rows
@@ -55,7 +70,7 @@ class Index extends Component {
         dataArr = rows.concat(dataArr)
         this.setState({
           data: dataArr,
-          pageNum: param.pageNum
+          current: param.current
         })
       }
     })
@@ -104,7 +119,7 @@ class Index extends Component {
       >
         {
           data.map((item, index) =>
-            <div className="bb-1" onClick={(e) => this.exam(e, item)}>
+            <div className="bb-1" onClick={(e) => this.exam(e, item)} key={index}>
               <WhiteSpace size="lg" />
               <WingBlank>
                 <span className="mr-20">{item.courseName}</span>
@@ -112,6 +127,7 @@ class Index extends Component {
                 <span className="mr-20">{item.teacherName}</span>
                 <div className="mt-10">
                   <span>{item.duration || 0}分钟</span>
+                  <span className={item.paperType * 1 === 0 ? "exam-class" : "task-class"}>{item.paperType * 1 === 0 ? "考试" : "作业测试"}</span>
                 </div>
                 <WhiteSpace size="lg" />
                 <div>

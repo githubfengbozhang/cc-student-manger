@@ -44,6 +44,14 @@ export const menus = [
     path: '/studyRoom',
     title: '自习室',
     icon: 'user',
+    hidden: true,
+    children: [
+      {
+        path: '/studyRoomQuestion',
+        title: '做题',
+        hidden: true
+      }
+    ]
   },
   // {
   //   path: '/icon',

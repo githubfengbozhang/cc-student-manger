@@ -15,16 +15,17 @@ class Index extends Component {
     super(props)
     this.state = {
       visible: false,
-      status: '',
+      status: 0,
       courseId: '',
       beginTime: '',
       endTime: '',
-      pageNum: 1,
       pageSize: 10,
       type: '',
       courseSelectList: [],
       list: [],
-      modalData: {}
+      modalData: {},
+      current: 1,
+      total: 0
     };
   }
   // 弹窗确定
@@ -50,15 +51,17 @@ class Index extends Component {
   // 获取列表数据
   getData = () => {
     let that = this;
-    const { status, courseId, type, pageNum, pageSize, beginTime, endTime } = that.state
-    $axios.post("/exam/api/student/task/queryExamTaskByUserId", qs.stringify({ status, courseId, type, pageNum, pageSize, beginTime, endTime })).then((res) => {
+    const { status, courseId, type, current, pageSize, beginTime, endTime } = that.state
+    $axios.post("/exam/api/student/task/queryExamTaskByUserId", qs.stringify({ status, courseId, type, current, pageSize, beginTime, endTime })).then((res) => {
       const {
         code,
-        rows
+        rows,
+        total
       } = res.data
       if (code === 0) {
         that.setState({
-          list: rows
+          list: rows,
+          total
         })
       }
     })
@@ -68,7 +71,7 @@ class Index extends Component {
     let that = this;
     let status = that.state.status
     let courseId = that.state.courseId
-    $axios.post("/exam/api/student/course/queryCourseByUserId", qs.stringify({ status, courseId })).then((res) => {
+    $axios.post("/exam/api/student/course/queryCourseByUserId", qs.stringify({ courseId })).then((res) => {
       const {
         code,
         data
@@ -108,8 +111,8 @@ class Index extends Component {
           status: values.status,
           courseId: values.courseId,
           type: values.type,
-          beginTime: `${data[0].format('YYYY-MM-DD')} 00:00:00`,
-          endTime: `${data[1].format('YYYY-MM-DD')} 23:59:59`,
+          beginTime: data ? `${data[0].format('YYYY-MM-DD')} 00:00:00` : '',
+          endTime: data ? `${data[1].format('YYYY-MM-DD')} 23:59:59` : '',
         }, () => {
           that.getData()
         })
@@ -118,8 +121,13 @@ class Index extends Component {
     });
   }
   // 分页
-  getPagination = (pagination) => {
-    console.log(pagination)
+  changePage = (page) => {
+    let that = this
+    that.setState({
+      current: page
+    }, () => {
+      that.getData()
+    })
   }
   componentDidMount () {
     this.getData()
@@ -139,11 +147,21 @@ class Index extends Component {
         data
       } = res.data
       if (code === 0) {
+        const examEndTime = new Date(data.examEndTime)
+        const systemTime = new Date(data.systemTime)
         if (data.examSort.length === 0) {
           notification['info']({
             message: '温馨提示！',
             description:
               '亲爱的同学,还未查询到相关的考试信息，请耐心等待或联系管理员。',
+          });
+          return
+        }
+        if (examEndTime.getTime() < systemTime.getTime()) {
+          notification['info']({
+            message: '温馨提示！',
+            description:
+              '亲爱的同学,考试已结束。',
           });
           return
         }
@@ -165,6 +183,16 @@ class Index extends Component {
       wrapperCol: { span: 16 },
       layout: 'inline'
     };
+    const { pageSize, current, total } = this.state
+    let pagination = {
+      pageSize: pageSize,
+      current: current,
+      total: total,
+      showQuickJumper: true,
+      showSizeChanger: true,
+      pageSizeOptions: ['5', '10', '20', '50', '100'],
+      onChange: this.changePage,
+    }
     const { getFieldDecorator } = this.props.form;
     const { list, courseSelectList, visible, modalData } = this.state
     return (
@@ -194,7 +222,9 @@ class Index extends Component {
             </FormItem>
             <FormItem label="任务状态" name="class">
               {
-                getFieldDecorator('status')(
+                getFieldDecorator('status', {
+                  initialValue: '0'
+                })(
                   <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择课程状态">
                     <Option value="">全部</Option>
                     <Option value="0">进行中</Option>
@@ -221,7 +251,7 @@ class Index extends Component {
           </Form>
         </div>
         <div className="shadow-radius">
-          <Table dataSource={list} rowKey={value => value.classId} onChange={() => this.getPagination()}>
+          <Table dataSource={list} rowKey={value => value.classId} pagination={pagination}>
             <Column title="考试/作业" dataIndex="courseName" key="courseName" />
             <Column title="课程名称" dataIndex="title" key="title" />
             <Column title="老师" dataIndex="teacherName" key="teacherName" />

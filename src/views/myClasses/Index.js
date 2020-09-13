@@ -287,8 +287,8 @@ class ClassBlock extends Component {
             <img src={java} className="class-img" alt={java} />
             <div className="class-fm-state" style={{ color: this.props.item.state === "已结束" ? 'red' : '#00bfff' }}>{this.props.item.state}</div>
           </div>
-          <div className="ml-20 font-size-22 class-fm-name">{this.props.item.courseName}</div>
-          <div className="class-fm-info"><span><Icon type="history" />{this.formatterDate(this.props.item.beginTime)}</span><span><Icon type="user" />{this.props.item.teacherName}</span></div>
+          <div className="ml-20 mt-20 font-size-22 class-fm-name">{this.props.item.courseName}</div>
+          <div className="class-fm-info"><span><Icon type="history" className="mr-10" />{this.formatterDate(this.props.item.beginTime)}</span><span><Icon type="user" />{this.props.item.teacherName}</span></div>
         </div>
         {
           visible ? <Modal

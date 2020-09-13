@@ -2,6 +2,7 @@ import Dashboard from '../views/dashboard/Index';
 import MyClass from '../views/myClasses/Index';
 import ClassData from '../views/classData/Index';
 import StudyRoom from '../views/studyRoom/Index';
+import StudyRoomQuestion from '../views/studyRoomQuestion/Index';
 import Task from '../views/task/Index';
 import Question from '../views/Question/Index';
 import View from "../views/view/Index";
@@ -34,9 +35,10 @@ export const routes = [
   { path: '/myClasses', component: MyClass },
   { path: '/classData', component: ClassData },
   { path: '/studyRoom', component: StudyRoom },
+  { path: '/studyRoomQuestion', component: StudyRoomQuestion },
   { path: '/task', component: Task },
   { path: '/question', component: Question },
-  { path: '/view', component: View},
+  { path: '/view', component: View },
   { path: '/icon', component: Icon },
   { path: '/form/basic', component: BasicForm },
   { path: '/form/editor', component: Editor },

@@ -55,7 +55,7 @@ const Question = (props) => {
           {
             Object.keys(questionItem).map((key, index) => (
               <RadioItem key={key} checked={radioKey === key} key={index} onChange={(e) => onChangeRadio(e, key)}>
-                {questionItem[key]}
+                {`${key}、${questionItem[key]}`}
               </RadioItem>
             ))
           }
@@ -70,7 +70,7 @@ const Question = (props) => {
         {
           Object.keys(questionItem).map((key, index) => (
             <CheckboxItem key={key} value={key} key={index} checked={keys.indexOf(key) > -1} onChange={(e) => onChangeCheckbox(e, key)}>
-              {questionItem[key]}
+              {`${key}、${questionItem[key]}`}
             </CheckboxItem>
           ))
         }
@@ -78,20 +78,10 @@ const Question = (props) => {
       </div>
     )
   } else if (questionType === "3") {// 填空
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 12 },
-        sm: { span: 2 },
-      },
-      wrapperCol: {
-        xs: { span: 12 },
-        sm: { span: 12 },
-      },
-    };
     return (
       <div>
         {
-          Object.keys(questionItem).map((key, index) =>
+          Object.keys(ansItem).map((key, index) =>
             getFieldDecorator(`answer[${index}]`, {
               initialValue: ansItem[key] ? ansItem[key] : ''
             })(<InputItem label={key} placeholder="填写答案" key={index}>{key}</InputItem>)
@@ -164,7 +154,8 @@ class Index extends Component {
     }, () => this.getQuestion(this.state.questionSqNo))
     let that = this
     const { systemTime, examEndTime } = this.props.location.state.questionData
-    let time = new Date(systemTime) - new Date(examEndTime)
+
+    let time = new Date(systemTime.replace(/-/g, '/')) - new Date(examEndTime.replace(/-/g, '/'))
     setInterval(function () {
       if (that.refs.countDown) {
         that.refs.countDown.innerHTML = showtime(time)
@@ -211,8 +202,10 @@ class Index extends Component {
       }
 
     } else {
+      let newAnsItem = {}
+      newAnsItem[key] = key
       this.setState({
-        ansItem: key
+        ansItem: newAnsItem
       })
     }
   }
@@ -233,7 +226,6 @@ class Index extends Component {
   next = (e) => {
     e.preventDefault();
     const { ansItem, questionType } = this.state
-
     let array = ''
     if (questionType * 1 === 1) {
       const keys = Object.keys(ansItem)
@@ -252,7 +244,7 @@ class Index extends Component {
       selectValue = ''
     } else if (questionType * 1 === 3) {
       if (this.props.form.getFieldValue("answer")) {
-        this.commitQuestion(ansItem)
+        this.commitQuestion(this.props.form.getFieldValue("answer"))
       } else {
         Toast.fail('请选或输入答案后继续答题', 1)
       }
@@ -268,7 +260,7 @@ class Index extends Component {
 
     let { history } = this.props
 
-    let { questionSqNo } = this.state
+    let { questionSqNo, questionType } = this.state
 
     const questionObject = this.state.examSort[questionSqNo]
 
@@ -294,6 +286,10 @@ class Index extends Component {
             history.push({ pathname: '/PhoneExam' })
           });
           return
+        }
+        if (questionType * 1 === 3) {
+          // 清空值
+          this.props.form.resetFields()
         }
         this.setState({
           questionSqNo

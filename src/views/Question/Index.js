@@ -28,11 +28,11 @@ const Question = (props) => {
             getFieldDecorator("answer", {
               initialValue: Object.keys(ansItem)[0] ? Object.keys(ansItem)[0] : ''
             })(
-              <Radio.Group >
+              <Radio.Group>
                 {
                   Object.keys(questionItem).map((key) =>
                     <Radio style={radioStyle} value={key} key={key}>
-                      {questionItem[key]}
+                      {`${key}、${questionItem[key]}`}
                     </Radio>
                   )
                 }
@@ -52,11 +52,11 @@ const Question = (props) => {
             getFieldDecorator("answer", {
               initialValue: Object.keys(ansItem) ? Object.keys(ansItem) : ''
             })(
-              <Checkbox.Group style={{ width: '100%' }} onChange={() => props.querstionOnChange()}>
+              <Checkbox.Group style={{ width: '100%' }} onChange={() => props.querstionOnChange()} className="question-radio">
                 {
                   Object.keys(questionItem).map((key) =>
                     <Col span={8} key={key}>
-                      <Checkbox style={radioStyle} value={key} key={key}>{questionItem[key]}</Checkbox>
+                      <Checkbox style={radioStyle} value={key} key={key}>{`${key}、${questionItem[key]}`}</Checkbox>
                     </Col>
                   )
                 }

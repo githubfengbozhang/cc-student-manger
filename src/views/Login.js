@@ -83,7 +83,7 @@ class Login extends Component {
           }}
         />
         <div className="content">
-          <div className="title">考试测评管理系统</div>
+          <div className="title">人才培训管理监测系统</div>
           <Form className="login-form">
             <FormItem>
               {getFieldDecorator('userName', {

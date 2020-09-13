@@ -154,7 +154,7 @@ class Index extends Component {
   }
   render () {
     const { state } = this.state
-    const cardContent = `欢迎登录重庆工业职业技术学院考试测评系统。`
+    const cardContent = `欢迎登录重庆工业职业技术学院人才培训管理监测系统。`
     return (
       <div >
         {
