@@ -3,7 +3,8 @@ import { Table, Icon } from 'antd';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
 import { withRouter } from 'react-router-dom';
-import './index.scss'
+import './index.scss';
+import { replaceString } from "@/utils/formmate.js"
 
 const { Column } = Table;
 
@@ -46,6 +47,9 @@ class Index extends Component {
     }
     this.getData()
   }
+  replace = (value) => {
+    return replaceString(value)
+  }
   render () {
     const { list } = this.state
     return (
@@ -61,7 +65,7 @@ class Index extends Component {
               render={(text, record) => {
                 return (
                   <div>
-                    <div className="questionTitle">{record.questionTitle}</div>
+                    <div className="questionTitle">{this.replace(record.questionTitle)}</div>
                     {/* <Divider></Divider> */}
                     <div>{record.itemTitle}</div>
                   </div>

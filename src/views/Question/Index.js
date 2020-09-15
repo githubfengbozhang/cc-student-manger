@@ -8,7 +8,7 @@ import $axios from "@/axios/$axios";
 import './index.scss'
 import { withRouter } from 'react-router-dom'
 import showtime from "../../utils/countdown.js"
-import {replaceString} from "@/utils/formmate.js"
+import { replaceString } from "@/utils/formmate.js"
 
 const Question = (props) => {
   let that = this
@@ -167,14 +167,14 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         const { systemTime, examEndTime } = data
-        let time = new Date(examEndTime) - new Date(systemTime) 
-        if(time <0){
+        let time = new Date(examEndTime) - new Date(systemTime)
+        if (time < 0) {
           this.info('考试时间已结束,请返回列表!')
-            return
-        } 
+          return
+        }
         setInterval(function () {
           if (that.refs.countDown) {
-            
+
             that.refs.countDown.innerHTML = showtime(time)
             time = time - 1000
             if (that.refs.countDown.innerHTML === "00小时:00分钟:00秒") {
@@ -222,7 +222,7 @@ class Index extends Component {
           notification['info']({
             message: '温馨提示！',
             description:
-              '亲爱的同学请做完本题后，再进行下一题进行作答。',
+              '亲爱的同学请做完本题后，再进行下一题作答。',
           });
           return
         }

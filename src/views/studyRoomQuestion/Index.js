@@ -6,7 +6,8 @@ import TypingCard from '../../components/TypingCard';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
 import './index.scss'
-import { withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom';
+import { replaceString } from "@/utils/formmate.js"
 
 
 const isShowAwser = false
@@ -178,7 +179,7 @@ class Index extends Component {
           notification['info']({
             message: '温馨提示！',
             description:
-              '亲爱的同学请做完本题后，再进行下一题进行作答。',
+              '亲爱的同学请做完本题后，再进行下一题作答。',
           });
           return
         }
@@ -267,6 +268,9 @@ class Index extends Component {
       }
     });
   }
+  replace = (value) => {
+    return replaceString(value)
+  }
   render () {
     const layout = {
       labelCol: { span: 8 },
@@ -281,7 +285,7 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span><span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div><span className="exam-icon">{questionTypeName}</span><span className="ml-20">{this.replace(questionTitle)}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
                     <Question questionItem={questionItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
