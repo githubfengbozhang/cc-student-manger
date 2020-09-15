@@ -8,6 +8,7 @@ import $axios from "@/axios/$axios";
 import './index.scss'
 import { withRouter } from 'react-router-dom'
 import showtime from "../../utils/countdown.js"
+import {replaceString} from "@/utils/formmate.js"
 
 const Question = (props) => {
   let that = this
@@ -166,9 +167,14 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         const { systemTime, examEndTime } = data
-        let time = new Date(systemTime) - new Date(examEndTime)
+        let time = new Date(examEndTime) - new Date(systemTime) 
+        if(time <0){
+          this.info('考试时间已结束,请返回列表!')
+            return
+        } 
         setInterval(function () {
           if (that.refs.countDown) {
+            
             that.refs.countDown.innerHTML = showtime(time)
             time = time - 1000
             if (that.refs.countDown.innerHTML === "00小时:00分钟:00秒") {
@@ -239,11 +245,6 @@ class Index extends Component {
   }
   // 下一步提交答案
   commitQuestion = (values) => {
-    // this.setState({
-    //   questionSqNo: this.state.questionSqNo + 1
-    // }, () => {
-    // this.axiosCommitQuestion(values)
-    // })
     this.axiosCommitQuestion(values)
   }
   // 提交答案的接口请求
@@ -312,6 +313,9 @@ class Index extends Component {
       }
     });
   }
+  replace = (value) => {
+    return replaceString(value)
+  }
   render () {
     const layout = {
       labelCol: { span: 8 },
@@ -326,7 +330,7 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20">{questionTitle}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20">{this.replace(questionTitle)}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
                     <Question questionItem={questionItem} ansItem={ansItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>

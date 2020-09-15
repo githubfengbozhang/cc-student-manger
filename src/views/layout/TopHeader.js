@@ -83,7 +83,7 @@ class TopHeader extends Component {
       <div className="top-header">
         <div className="top-header-inner">
           <Icon className="trigger" type={true ? 'menu-unfold' : 'menu-fold'} onClick={this.toggle} />
-          <div className="header-title"><img src={blueLogo} style={{ height: '30px' }}></img> | 人才培训管理监测系统</div>
+          <div className="header-title"><img src={blueLogo} style={{ height: '30px' }} alt=''></img> | 人才培训管理监测系统</div>
           <div className="header-right">
             <div className="full-screen">
               <FullScreen />

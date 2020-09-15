@@ -51,8 +51,9 @@ class Index extends Component {
     return (
       <div className="task">
         <div className="shadow-radius">
-          <Table dataSource={list} rowKey={(record, index) => index} onChange={() => this.getPagination()} pagination={false}>
+          <Table dataSource={list} rowKey={value => value.questionTitle} onChange={() => this.getPagination()} pagination={false}>
             <Column title="序号"
+              key={(record, index) => index}
               width={70}
               render={(text, record, index) => `${index + 1}`}
             ></Column>

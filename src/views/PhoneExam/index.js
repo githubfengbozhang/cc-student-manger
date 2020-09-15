@@ -64,9 +64,13 @@ class Index extends Component {
     $axios.post("/exam/api/student/task/queryExamTaskByUserId", qs.stringify({ status, courseId, type, current: param.current, pageSize })).then((res) => {
       const {
         code,
-        rows
+        rows,
+        total
       } = res.data
       if (code === 0) {
+        if(total < param.current * pageSize && param.current>1){
+          return
+        }
         dataArr = rows.concat(dataArr)
         this.setState({
           data: dataArr,

@@ -68,7 +68,6 @@ class Index extends Component {
     $axios.post("/exam/api/student/course/addCourseByInvitCode", qs.stringify({ inviteCode })).then((res) => {
       const {
         code,
-        data,
         msg
       } = res.data
       if (code === 0) {
@@ -293,6 +292,7 @@ class ClassBlock extends Component {
         {
           visible ? <Modal
             title="课程详情"
+            width = { 800 }
             visible={this.state.visible}
             onOk={() => this.handleOk()}
             onCancel={() => this.handleOk()}

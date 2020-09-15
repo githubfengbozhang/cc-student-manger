@@ -11,6 +11,7 @@ const chalk = require('react-dev-utils/chalk');
  * @param {Object} options
  */
 function getAdditionalModulePaths(options = {}) {
+  debugger
   const baseUrl = options.baseUrl;
 
   // We need to explicitly check for null and undefined (and not a falsy value) because

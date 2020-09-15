@@ -69,7 +69,7 @@ class Index extends Component {
   // 课程下拉数据
   getCourseSelectList = () => {
     let that = this;
-    let status = that.state.status
+    // let status = that.state.status
     let courseId = that.state.courseId
     $axios.post("/exam/api/student/course/queryCourseByUserId", qs.stringify({ courseId })).then((res) => {
       const {
@@ -93,6 +93,10 @@ class Index extends Component {
         rows
       } = res.data
       if (code === 0) {
+        debugger
+        if(rows.length === 0 || (rows[0] && rows[0].taskExamStatus * 1 === 0)){
+          return
+        }
         that.setState({
           modalData: rows[0] || {},
           visible: true
@@ -121,10 +125,22 @@ class Index extends Component {
     });
   }
   // 分页
-  changePage = (page) => {
+  changePage = (current,pageSize) => {
+    debugger
     let that = this
     that.setState({
-      current: page
+      current,
+      pageSize
+    }, () => {
+      that.getData()
+    })
+  }
+  // pageSize变化
+  showSizeChange = (current, pageSize) => {
+    let that = this
+    that.setState({
+      current,
+      pageSize
     }, () => {
       that.getData()
     })
@@ -192,6 +208,7 @@ class Index extends Component {
       showSizeChanger: true,
       pageSizeOptions: ['5', '10', '20', '50', '100'],
       onChange: this.changePage,
+      onShowSizeChange:this.showSizeChange
     }
     const { getFieldDecorator } = this.props.form;
     const { list, courseSelectList, visible, modalData } = this.state
@@ -251,7 +268,7 @@ class Index extends Component {
           </Form>
         </div>
         <div className="shadow-radius">
-          <Table dataSource={list} rowKey={value => value.classId} pagination={pagination}>
+          <Table dataSource={list} rowKey={value => value.title} pagination={pagination}>
             <Column title="考试/作业" dataIndex="courseName" key="courseName" />
             <Column title="课程名称" dataIndex="title" key="title" />
             <Column title="老师" dataIndex="teacherName" key="teacherName" />
@@ -280,15 +297,26 @@ class Index extends Component {
                 }
               }}
             />
+             <Column title="任务完成情况" dataIndex="taskExamStatus" key="taskExamStatus"
+              render={(text, record) => {
+                if (record.taskExamStatus * 1 === 0) {
+                  return '已完成'
+                } else if (record.taskExamStatus * 1 === 1) {
+                  return '进行中'
+                } else {
+                  return '未开始'
+                }
+              }}
+            />
             <Column
               title="操作"
               key="action"
               width={200}
               render={(text, record) => (
                 <span>
-                  <a href='#' onClick={(e) => this.view(e, record)}>查看</a>
+                  <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
                   <Divider type="vertical" />
-                  <a href='#' onClick={(e) => this.exam(e, record)}>考试</a>
+                  <a href='/#' onClick={(e) => this.exam(e, record)}>考试</a>
                 </span>
               )}
             />
