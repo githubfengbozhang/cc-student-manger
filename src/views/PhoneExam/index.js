@@ -40,7 +40,8 @@ class Index extends Component {
           Toast.offline('亲爱的同学,还未查询到相关的考试信息，请耐心等待或联系管理员。', 2)
           return
         }
-        if (examEndTime.getTime() < systemTime.getTime()) {
+        // taskExamStatus 0是完成
+        if (examEndTime.getTime() < systemTime.getTime() || data.taskExamStatus * 1 === 0) {
           Toast.offline('亲爱的同学,考试已结束。', 2)
           return
         }
@@ -85,6 +86,15 @@ class Index extends Component {
     setTimeout(() => {
       this.setState({ refreshing: false });
     }, 1000);
+  }
+  formmatTaskExamStatus = (value) => {
+    if (value * 1 === 0) {
+      return '已完成'
+    } else if (value * 1 === 1) {
+      return '进行中'
+    } else {
+      return '未开始'
+    }
   }
   componentDidUpdate () {
     if (this.state.useBodyScroll) {
@@ -133,6 +143,7 @@ class Index extends Component {
                   <span>{item.duration || 0}分钟</span>
                   <span className={item.paperType * 1 === 0 ? "exam-class" : "task-class"}>{item.paperType * 1 === 0 ? "考试" : "作业测试"}</span>
                 </div>
+                <span className="mr-20">{this.formmatTaskExamStatus(item.taskExamStatus)}</span>
                 <WhiteSpace size="lg" />
                 <div>
                   <span>{item.examBeginTime}</span>

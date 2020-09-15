@@ -173,11 +173,21 @@ class Index extends Component {
           });
           return
         }
-        if (examEndTime.getTime() < systemTime.getTime()) {
+        if (examEndTime.getTime() < systemTime.getTime() ) {
           notification['info']({
             message: '温馨提示！',
             description:
-              '亲爱的同学,考试已结束。',
+              '亲爱的同学,考试时间已结束。',
+          });
+          return
+        }
+        // paperType 0 为考试 1为作业
+        // taskExamStatus 0是完成
+        if(data.paperType * 1 === 0 && data.taskExamStatus * 1 ===0 ){
+          notification['info']({
+            message: '温馨提示！',
+            description:
+              '亲爱的同学,考试已完成,不能重复答题',
           });
           return
         }
@@ -289,9 +299,17 @@ class Index extends Component {
             <Column title="任务类型" dataIndex="paperType" key="paperType"
               render={(text, record) => {
                 if (record.paperType * 1 === 0) {
-                  return '考试'
+                  return (
+                    <div className="exam-class">
+                      考试
+                    </div>
+                  )
                 } else if (record.paperType * 1 === 1) {
-                  return '作业测试'
+                  return (
+                    <div className="task-class">
+                      作业测试
+                    </div>
+                  )
                 } else {
                   return '-'
                 }
