@@ -94,7 +94,7 @@ class Index extends Component {
       } = res.data
       if (code === 0) {
         debugger
-        if(rows.length === 0 || (rows[0] && rows[0].taskExamStatus * 1 === 0)){
+        if (rows.length === 0 || (rows[0] && rows[0].taskExamStatus * 1 === 0)) {
           return
         }
         that.setState({
@@ -125,7 +125,7 @@ class Index extends Component {
     });
   }
   // 分页
-  changePage = (current,pageSize) => {
+  changePage = (current, pageSize) => {
     debugger
     let that = this
     that.setState({
@@ -152,7 +152,6 @@ class Index extends Component {
   }
   // 考试
   exam = (e, record) => {
-    e.preventDefault();
     let that = this;
     let { history } = that.props
 
@@ -165,6 +164,7 @@ class Index extends Component {
       if (code === 0) {
         const examEndTime = new Date(data.examEndTime)
         const systemTime = new Date(data.systemTime)
+        const examBeginTime = new Date(data.examBeginTime)
         if (data.examSort.length === 0) {
           notification['info']({
             message: '温馨提示！',
@@ -173,7 +173,8 @@ class Index extends Component {
           });
           return
         }
-        if (examEndTime.getTime() < systemTime.getTime() ) {
+        // 考试时间结束
+        if (examEndTime.getTime() < systemTime.getTime()) {
           notification['info']({
             message: '温馨提示！',
             description:
@@ -181,9 +182,19 @@ class Index extends Component {
           });
           return
         }
+        debugger
+        // 考试 开始时间验证
+        if (examBeginTime.getTime() > systemTime.getTime() && paperType * 1 === 0) {
+          notification['info']({
+            message: '温馨提示！',
+            description:
+              '亲爱的同学,考试还未开始，请耐心等待。',
+          });
+          return
+        }
         // paperType 0 为考试 1为作业
         // taskExamStatus 0是完成
-        if(data.paperType * 1 === 0 && data.taskExamStatus * 1 ===0 ){
+        if (paperType * 1 === 0 && data.taskExamStatus * 1 === 0) {
           notification['info']({
             message: '温馨提示！',
             description:
@@ -218,7 +229,7 @@ class Index extends Component {
       showSizeChanger: true,
       pageSizeOptions: ['5', '10', '20', '50', '100'],
       onChange: this.changePage,
-      onShowSizeChange:this.showSizeChange
+      onShowSizeChange: this.showSizeChange
     }
     const { getFieldDecorator } = this.props.form;
     const { list, courseSelectList, visible, modalData } = this.state
@@ -315,7 +326,7 @@ class Index extends Component {
                 }
               }}
             />
-             <Column title="任务完成情况" dataIndex="taskExamStatus" key="taskExamStatus"
+            <Column title="任务完成情况" dataIndex="taskExamStatus" key="taskExamStatus"
               render={(text, record) => {
                 if (record.taskExamStatus * 1 === 0) {
                   return '已完成'
@@ -329,7 +340,7 @@ class Index extends Component {
             <Column
               title="操作"
               key="action"
-              width={200}
+              width={120}
               render={(text, record) => (
                 <span>
                   <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>

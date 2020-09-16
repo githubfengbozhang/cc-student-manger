@@ -36,6 +36,7 @@ class Index extends Component {
       if (code === 0 && data.examSort.length > 0) {
         const examEndTime = new Date(data.examEndTime)
         const systemTime = new Date(data.systemTime)
+        const examBeginTime = new Date(data.examBeginTime)
         if (data.examSort.length === 0) {
           Toast.offline('亲爱的同学,还未查询到相关的考试信息，请耐心等待或联系管理员。', 2)
           return
@@ -43,6 +44,11 @@ class Index extends Component {
         // taskExamStatus 0是完成
         if (examEndTime.getTime() < systemTime.getTime() || data.taskExamStatus * 1 === 0) {
           Toast.offline('亲爱的同学,考试已结束。', 2)
+          return
+        }
+        // 考试 开始时间验证
+        if (examBeginTime.getTime() > systemTime.getTime()) {
+          Toast.offline('亲爱的同学,考试还未开始，请耐心等待。', 2)
           return
         }
         if (!systemTime || !examEndTime) {
@@ -69,7 +75,7 @@ class Index extends Component {
         total
       } = res.data
       if (code === 0) {
-        if(total < param.current * pageSize && param.current>1){
+        if (total < param.current * pageSize && param.current > 1) {
           return
         }
         dataArr = rows.concat(dataArr)
