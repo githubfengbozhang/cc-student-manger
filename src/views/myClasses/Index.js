@@ -225,7 +225,7 @@ class InviteCodeModal extends Component {
         <Form.Item label="邀请码">
           {getFieldDecorator('inviteCode', {
             rules: [{ required: true, message: '请输入课程邀请码' }],
-          })(<Input placeholder="请输入邀请码" />)}
+          })(<Input placeholder="请输入邀请码" autoComplete="off" />)}
         </Form.Item>
       </Form >
     )
@@ -292,7 +292,7 @@ class ClassBlock extends Component {
         {
           visible ? <Modal
             title="课程详情"
-            width = { 800 }
+            width={800}
             visible={this.state.visible}
             onOk={() => this.handleOk()}
             onCancel={() => this.handleOk()}

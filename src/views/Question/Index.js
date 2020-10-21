@@ -33,7 +33,7 @@ const Question = (props) => {
                 {
                   Object.keys(questionItem).map((key) =>
                     <Radio style={radioStyle} value={key} key={key}>
-                      {`${key}、${questionItem[key]}`}
+                      {`${key}、${replaceString(questionItem[key])}`}
                     </Radio>
                   )
                 }
@@ -57,7 +57,7 @@ const Question = (props) => {
                 {
                   Object.keys(questionItem).map((key) =>
                     <Col span={8} key={key}>
-                      <Checkbox style={radioStyle} value={key} key={key}>{`${key}、${questionItem[key]}`}</Checkbox>
+                      <Checkbox style={radioStyle} value={key} key={key}>{`${key}、${replaceString(questionItem[key])}`}</Checkbox>
                     </Col>
                   )
                 }
@@ -87,7 +87,7 @@ const Question = (props) => {
               {
                 getFieldDecorator(`answer[${index}]`, {
                   initialValue: ansItem[key] ? ansItem[key] : ''
-                })(<Input />)
+                })(<Input autoComplete="off" />)
               }
 
             </Form.Item>
@@ -330,7 +330,9 @@ class Index extends Component {
             <div className="exam">
               <div className="exam-header">
                 <div className="exam-title">
-                  <div><span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20">{this.replace(questionTitle)}</span> <span className="easyScale">(难度：{easyScaleName})</span></div>
+                  <div>
+                    <span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20"
+                      dangerouslySetInnerHTML={{ __html: this.replace(questionTitle) }}></span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
                     <Question questionItem={questionItem} ansItem={ansItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>

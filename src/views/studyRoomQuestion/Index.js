@@ -34,7 +34,7 @@ const Question = (props) => {
                 {
                   Object.keys(questionItem).map((key) =>
                     <Radio style={radioStyle} value={key} key={key}>
-                      {`${key}、${questionItem[key].title}`}
+                      {`${key}、${replaceString(questionItem[key].title)}`}
                     </Radio>
                   )
                 }
@@ -55,7 +55,7 @@ const Question = (props) => {
                 {
                   Object.keys(questionItem).map((key) =>
                     <Col span={8} key={key}>
-                      <Checkbox style={radioStyle} value={key} key={key}>{`${key}、${questionItem[key].title}`}</Checkbox>
+                      <Checkbox style={radioStyle} value={key} key={key}>{`${key}、${replaceString(questionItem[key].title)}`}</Checkbox>
                     </Col>
                   )
                 }
@@ -83,7 +83,7 @@ const Question = (props) => {
           Object.keys(questionItem).map((key, index) =>
             <Form.Item label={key} key={index}>
               {
-                getFieldDecorator(`answer[${index}]`)(<Input />)
+                getFieldDecorator(`answer[${index}]`)(<Input autoComplete="off" />)
               }
 
             </Form.Item>

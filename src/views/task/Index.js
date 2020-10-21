@@ -93,7 +93,6 @@ class Index extends Component {
         rows
       } = res.data
       if (code === 0) {
-        debugger
         if (rows.length === 0 || (rows[0] && rows[0].taskExamStatus * 1 === 0)) {
           return
         }
@@ -126,7 +125,6 @@ class Index extends Component {
   }
   // 分页
   changePage = (current, pageSize) => {
-    debugger
     let that = this
     that.setState({
       current,
@@ -182,7 +180,6 @@ class Index extends Component {
           });
           return
         }
-        debugger
         // 考试 开始时间验证
         if (examBeginTime.getTime() > systemTime.getTime() && paperType * 1 === 0) {
           notification['info']({
@@ -345,7 +342,7 @@ class Index extends Component {
                 <span>
                   <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
                   <Divider type="vertical" />
-                  <a href='/#' onClick={(e) => this.exam(e, record)}>考试</a>
+                  <a onClick={(e) => this.exam(e, record)}>考试</a>
                 </span>
               )}
             />
