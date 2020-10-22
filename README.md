@@ -1,7 +1,7 @@
 ## CC-STUDENT-MANGER
 
 ### 简介
-重庆人才培养管理监测
+重庆人才培养管理监测系统
 ### 项目结构
 
 ```javascript

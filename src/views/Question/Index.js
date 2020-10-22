@@ -328,6 +328,7 @@ class Index extends Component {
         {
           <div className="shadow-radius">
             <div className="exam">
+              <div className="time-show">距离本次测试结束还有<span className="exam-time" ref="countDown">00:00:00</span></div>
               <div className="exam-header">
                 <div className="exam-title">
                   <div>
@@ -341,7 +342,7 @@ class Index extends Component {
                     <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.examSort.length === this.state.questionSqNo ? "提交" : "下一题"}</Button>
                   </div>
                 </div>
-                <div>距离本次测试结束还有<span className="exam-time" ref="countDown">00:00:00</span></div>
+               
               </div>
 
             </div>

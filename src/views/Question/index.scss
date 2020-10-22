@@ -10,6 +10,11 @@
 .exam{
   margin:20px 60px 0 20px;
 }
+.time-show{
+    text-align: right;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
 .exam-header{
   display: flex;
   flex-wrap: nowrap;
@@ -48,6 +53,7 @@
 }
 .exam-time{
   color: red;
+  padding-left: 20px;
 }
 .exam-btn{
   padding-left: 90px;
