@@ -78,10 +78,12 @@ const Question = (props) => {
         sm: { span: 12 },
       },
     };
+    debugger
     return (
-
+        
       <Form {...formItemLayout} onSubmit={() => props.handleSubmit()}>
         {
+            
           Object.keys(questionItem).map((key, index) =>
             <Form.Item label={key} key={index}>
               {
@@ -120,6 +122,7 @@ class Index extends Component {
   }
   // 获取题
   getQuestion = (questionSqNo) => {
+      debugger
     let that = this;
     const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
     const questionId = Object.keys(examSort[questionSqNo - 1])[0]
@@ -238,7 +241,7 @@ class Index extends Component {
   // 查看上一步提交的答案
   commitPreviousQuestion = () => {
     this.setState({
-      questionSqNo: this.state.questionSqNo - 1
+      questionSqNo: this.state.questionSqNo - 1,
     }, () => {
       this.getQuestion(this.state.questionSqNo)
     })
@@ -276,8 +279,10 @@ class Index extends Component {
         this.props.form.setFieldsValue({
           answer: '',
         });
+
         this.setState({
-          questionSqNo: this.state.questionSqNo + 1
+          questionSqNo: this.state.questionSqNo + 1,
+          ansItem:''
         }, () => {
           this.getQuestion(this.state.questionSqNo)
         })
