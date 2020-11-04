@@ -19,7 +19,7 @@ const Question = (props) => {
   };
 
 
-  const { questionItem, questionType, ansItem } = props
+  const { questionItem, questionType, ansItem, questionId } = props
   const { getFieldDecorator } = props.form;
   if (questionType === "0" || questionType === "2") {// 单选和判断
     return (
@@ -78,14 +78,13 @@ const Question = (props) => {
         sm: { span: 12 },
       },
     };
-    debugger
     return (
-        
+
       <Form {...formItemLayout} onSubmit={() => props.handleSubmit()}>
         {
-            
+
           Object.keys(questionItem).map((key, index) =>
-            <Form.Item label={key} key={index}>
+            <Form.Item label={key} key={index + questionId}>
               {
                 getFieldDecorator(`answer[${index}]`, {
                   initialValue: ansItem[key] ? ansItem[key] : ''
@@ -122,7 +121,6 @@ class Index extends Component {
   }
   // 获取题
   getQuestion = (questionSqNo) => {
-      debugger
     let that = this;
     const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
     const questionId = Object.keys(examSort[questionSqNo - 1])[0]
@@ -141,9 +139,13 @@ class Index extends Component {
           });
         } else if (questionType === "1" || questionType === "3") { //多选和填空
           const answer = Object.keys(ansItem)
-          this.props.form.setFieldsValue({
-            answer: answer,
+          const array = answer.map(item => {
+            return ansItem[item]
           });
+          this.props.form.setFieldsValue({
+            answer: array,
+          });
+          this.props.form.resetFields()
         }
         setTimeout(() => {
           that.setState({
@@ -275,14 +277,9 @@ class Index extends Component {
           this.info('您已考试完毕,请返回列表!')
           return
         }
-        // TODO 下一题的时候有答案情况下不应该被置空
-        this.props.form.setFieldsValue({
-          answer: '',
-        });
-
         this.setState({
           questionSqNo: this.state.questionSqNo + 1,
-          ansItem:''
+          ansItem: ''
         }, () => {
           this.getQuestion(this.state.questionSqNo)
         })
@@ -340,14 +337,14 @@ class Index extends Component {
                     <span className="exam-icon">{questionTypeName}</span>{questionSqNo}/{examSort.length}:<span className="ml-20"
                       dangerouslySetInnerHTML={{ __html: this.replace(questionTitle) }}></span> <span className="easyScale">(难度：{easyScaleName})</span></div>
                   <div className="exam-content">
-                    <Question questionItem={questionItem} ansItem={ansItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
+                    <Question questionItem={questionItem} questionId={questionId} ansItem={ansItem} form={this.props.form} questionType={questionType} querstionOnChange={() => this.querstionOnChange}></Question>
                   </div>
                   <div className="exam-btn">
                     <Button type="primary" size="large" disabled={questionSqNo === 1} className="mr-20" onClick={(e) => this.previous(e)}>上一题</Button>
                     <Button type="primary" size="large" onClick={(e) => this.next(e)}>{this.state.examSort.length === this.state.questionSqNo ? "提交" : "下一题"}</Button>
                   </div>
                 </div>
-               
+
               </div>
 
             </div>
