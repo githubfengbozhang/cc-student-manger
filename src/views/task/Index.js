@@ -153,7 +153,7 @@ class Index extends Component {
     let that = this;
     let { history } = that.props
 
-    const { courseId, paperId, paperType, userId } = record
+    const { courseId, paperId, paperType, userId, taskExamStatus, status } = record
     $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
       const {
         code,
@@ -163,7 +163,7 @@ class Index extends Component {
         const examEndTime = new Date(data.examEndTime)
         const systemTime = new Date(data.systemTime)
         const examBeginTime = new Date(data.examBeginTime)
-        if (data.examSort.length === 0) {
+        if (data.examSort.length === 0 && status * 1 === 0) {
           notification['info']({
             message: '温馨提示！',
             description:
@@ -191,7 +191,7 @@ class Index extends Component {
         }
         // paperType 0 为考试 1为作业
         // taskExamStatus 0是完成
-        if (paperType * 1 === 0 && data.taskExamStatus * 1 === 0) {
+        if (taskExamStatus * 1 === 0) {
           notification['info']({
             message: '温馨提示！',
             description:
@@ -299,9 +299,9 @@ class Index extends Component {
         </div>
         <div className="shadow-radius">
           <Table dataSource={list} rowKey={value => value.title} pagination={pagination}>
-            <Column title="考试/作业" dataIndex="courseName" key="courseName" />
-            <Column title="课程名称" dataIndex="title" key="title" />
-            <Column title="老师" dataIndex="teacherName" key="teacherName" />
+            <Column title="考试/作业" dataIndex="title" key="title" />
+            <Column title="课程名称" dataIndex="courseName" key="courseName" />
+            <Column title="教师" dataIndex="teacherName" key="teacherName" />
             <Column title="开始时间" dataIndex="examBeginTime" key="examBeginTime" />
             <Column title="结束时间" dataIndex="examEndTime" key="examEndTime" />
             <Column title="考试时长" dataIndex="duration" key="duration" />
@@ -354,7 +354,7 @@ class Index extends Component {
                 <span>
                   <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
                   <Divider type="vertical" />
-                  <a onClick={(e) => this.exam(e, record)}>考试</a>
+                  <a onClick={(e) => this.exam(e, record)}>答题</a>
                 </span>
               )}
             />
