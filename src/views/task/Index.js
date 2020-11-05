@@ -204,9 +204,21 @@ class Index extends Component {
       }
     })
   }
+  /**
+   * 查看
+   */
   view = (e, record) => {
     e.preventDefault();
     let that = this;
+    // 考试时间结束
+    if (record.taskExamStatus*1 === 1) {
+        notification['info']({
+          message: '温馨提示！',
+          description:
+            '亲爱的同学,请结束后查看。',
+        });
+        return
+      }
     let { history } = that.props
     history.push({ pathname: '/view', state: { ...record } })
     localStorage.setItem('/view', JSON.stringify({ ...record }))

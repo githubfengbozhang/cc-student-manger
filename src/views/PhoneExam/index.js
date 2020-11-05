@@ -27,7 +27,7 @@ class Index extends Component {
     let that = this;
     let { history } = that.props
 
-    const { courseId, paperId, paperType, userId } = record
+    const { courseId, paperId, paperType, userId,taskExamStatus } = record
     $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
       const {
         code,
@@ -42,7 +42,7 @@ class Index extends Component {
           return
         }
         // taskExamStatus 0是完成
-        if (examEndTime.getTime() < systemTime.getTime() || data.taskExamStatus * 1 === 0) {
+        if (examEndTime.getTime() < systemTime.getTime() ||taskExamStatus * 1 === 0) {
           Toast.offline('亲爱的同学,考试已结束。', 2)
           return
         }
