@@ -5,7 +5,12 @@ import * as serviceWorker from './serviceWorker';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
 import moment from 'moment';
-import 'moment/locale/zh-cn'
+import 'moment/locale/zh-cn';
+
+import Vconsole from 'vconsole'
+
+const vconsole = new Vconsole()
+
 moment.locale('en');
 console.log(`Looks like we are in ${process.env.REACT_APP_BASE_URL} mode!`);
 ReactDOM.render(
