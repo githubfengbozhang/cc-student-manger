@@ -1,4 +1,4 @@
-'use strict';
+
 
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
@@ -9,6 +9,7 @@ const fs = require('fs');
 
 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 const host = process.env.HOST || 'local';
+// const host = '192.168.18.128'
 
 module.exports = function (proxy, allowedHost) {
   return {
