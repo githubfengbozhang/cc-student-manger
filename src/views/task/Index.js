@@ -180,12 +180,12 @@ class Index extends Component {
           });
           return
         }
-        // 考试 开始时间验证
-        if (examBeginTime.getTime() > systemTime.getTime() && paperType * 1 === 0) {
+        // 开始时间验证
+        if (examBeginTime.getTime() > systemTime.getTime()) {
           notification['info']({
             message: '温馨提示！',
             description:
-              '亲爱的同学,考试还未开始，请耐心等待。',
+              '亲爱的同学,答题时间还未开始，请耐心等待。',
           });
           return
         }
@@ -195,7 +195,7 @@ class Index extends Component {
           notification['info']({
             message: '温馨提示！',
             description:
-              '亲爱的同学,考试已完成,不能重复答题',
+              '亲爱的同学,您已答题完成，请再任务时间之后查看答题结果。',
           });
           return
         }
@@ -211,14 +211,14 @@ class Index extends Component {
     e.preventDefault();
     let that = this;
     // 考试时间结束
-    if (record.taskExamStatus*1 === 1) {
-        notification['info']({
-          message: '温馨提示！',
-          description:
-            '亲爱的同学,请结束后查看。',
-        });
-        return
-      }
+    if (record.taskExamStatus * 1 === 1) {
+      notification['info']({
+        message: '温馨提示！',
+        description:
+          '亲爱的同学,请结束后查看。',
+      });
+      return
+    }
     let { history } = that.props
     history.push({ pathname: '/view', state: { ...record } })
     localStorage.setItem('/view', JSON.stringify({ ...record }))
