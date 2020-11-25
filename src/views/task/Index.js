@@ -350,13 +350,24 @@ class Index extends Component {
               title="操作"
               key="action"
               width={120}
-              render={(text, record) => (
-                <span>
-                  <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
-                  <Divider type="vertical" />
-                  <a onClick={(e) => this.exam(e, record)}>答题</a>
-                </span>
-              )}
+              render={(text, record) => {
+                if(record.status * 1 === 1){
+                   return (
+                    <span>
+                        <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
+                  </span>
+                   )
+                }else{
+                    return (
+                        <span>
+                            <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
+                            <Divider type="vertical" />
+                            <a onClick={(e) => this.exam(e, record)}>答题</a>
+                        </span>
+                    )
+                }
+                
+              }}
             />
           </Table>
         </div>

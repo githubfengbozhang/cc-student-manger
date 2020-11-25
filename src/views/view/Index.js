@@ -72,8 +72,8 @@ class Index extends Component {
                 )
               }}
             />
-            <Column title="答案" dataIndex="examAnswer" key="examAnswer" width={300} />
-            <Column title="我的答案" dataIndex="answer" key="answer" width={300} />
+            <Column title="答案" dataIndex="answer" key="answer"  width={300} />
+            <Column title="我的答案" dataIndex="examAnswer" key="examAnswer" width={300} />
             <Column title="是否正确" dataIndex="correct" key="correct" width={150}
               render={(text, record) => {
                 if (record.correct === "错误") {

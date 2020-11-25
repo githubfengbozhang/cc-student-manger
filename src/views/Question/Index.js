@@ -123,7 +123,11 @@ class Index extends Component {
   getQuestion = (questionSqNo) => {
     let that = this;
     const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
-    const questionId = Object.keys(examSort[questionSqNo - 1])[0]
+    const examSortObject = examSort[questionSqNo - 1];
+    if(examSortObject){
+        return
+    }
+    const questionId = Object.keys(examSortObject)[0]
     $axios.post("/exam/api/student/question/queryQuerstionByQuestionId", qs.stringify({ questionId, courseId, paperId, paperType })).then((res) => {
       const {
         code,

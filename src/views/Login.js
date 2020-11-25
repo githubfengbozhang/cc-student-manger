@@ -31,7 +31,6 @@ class Login extends Component {
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('userName', data.userName);
             localStorage.setItem('isLogin', true);
-            // 模拟生成一些数据
             this.props.setUserInfo(Object.assign({}, values, { role: { type: 1, name: data.userName } }));
             localStorage.setItem('userInfo', JSON.stringify(Object.assign({}, values, { role: { type: 1, name: data.userName } })));
             // if (window.navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
