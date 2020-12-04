@@ -223,6 +223,15 @@ class Index extends Component {
     history.push({ pathname: '/view', state: { ...record } })
     localStorage.setItem('/view', JSON.stringify({ ...record }))
   }
+  /**
+   * 综合分析
+   */
+  analysis = (e,record) => {
+    e.preventDefault();
+    let that = this;
+    let { history } = that.props
+    history.push({ pathname: '/classData', state: { ...record } })
+  }
   render () {
     const layout = {
       labelCol: { span: 8 },
@@ -305,7 +314,7 @@ class Index extends Component {
             <Column title="开始时间" dataIndex="examBeginTime" key="examBeginTime" />
             <Column title="结束时间" dataIndex="examEndTime" key="examEndTime" />
             <Column title="考试时长" dataIndex="duration" key="duration" />
-            <Column title="任务状态" dataIndex="status" key="status"
+            <Column title="状态" dataIndex="status" key="status"
               render={(text, record) => {
                 if (record.status * 1 === 0) {
                   return '进行中'
@@ -316,7 +325,7 @@ class Index extends Component {
                 }
               }}
             />
-            <Column title="任务类型" dataIndex="paperType" key="paperType"
+            <Column title="类型" dataIndex="paperType" key="paperType"
               render={(text, record) => {
                 if (record.paperType * 1 === 0) {
                   return (
@@ -335,7 +344,7 @@ class Index extends Component {
                 }
               }}
             />
-            <Column title="任务完成情况" dataIndex="taskExamStatus" key="taskExamStatus"
+            <Column title="完成情况" dataIndex="taskExamStatus" key="taskExamStatus"
               render={(text, record) => {
                 if (record.taskExamStatus * 1 === 0) {
                   return '已完成'
@@ -349,12 +358,14 @@ class Index extends Component {
             <Column
               title="操作"
               key="action"
-              width={120}
+              width={150}
               render={(text, record) => {
                 if(record.status * 1 === 1){
                    return (
                     <span>
                         <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
+                        <Divider type="vertical" />
+                        <a href='/#' onClick={(e) => this.analysis(e, record)}>综合分析</a>
                   </span>
                    )
                 }else{

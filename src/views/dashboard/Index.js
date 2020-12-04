@@ -3,41 +3,10 @@ import TypingCard from '../../components/TypingCard'
 import Chart from '@/components/chart/Chart';
 import { connect } from 'react-redux';
 import { Pagination } from 'antd';
-import './index.scss'
+import './index.scss';
+import {targetChart,testChart} from './options.js'
 
-const chartData = {
-  backgroundColor: '#fff',
-  title: {
-    top: 30,
-    text: '综合分析',
-    textStyle: {
-      fontWeight: 'normal',
-      fontSize: 16,
-      color: '#57617B'
-    },
-    left: 'center'
-  },
-  color: ['#001529', '#1890FF', '#20e0ce'],
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b} : {c} ({d}%)'
-  },
-  legend: {
-    orient: 'vertical',
-    x: 20,
-    data: ['知识', '能力', '素质'],
-    top: 20
-  },
-  series: [
-    {
-      name: '',
-      type: 'pie',
-      radius: '55%',
-      center: ['50%', '60%'],
-      data: [{ value: 100, name: '知识' }, { value: 50, name: '能力' }, { value: 50, name: '素质' }]
-    }
-  ]
-};
+
 const chartBarData = {
   backgroundColor: '#fff',
   title: {
@@ -167,9 +136,25 @@ class Index extends Component {
           <div className="chart-block">
             <div className="data-flex">
               <div style={{ width: '100%', marginRight: '10px' }}>
-                <Chart chartData={chartData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                <div>总目标统计</div>
+                <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+              </div>
+              <div style={{ width: '100%' }}>
+                <div>测试统计</div>
+                <Chart chartData={testChart()} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
               </div>
               <div style={{ width: '100%', marginLeft: '10px' }}>
+                <div>近期课程</div>
+                <Chart chartData={chartBarData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+              </div>
+            </div>
+            <div className="data-flex">
+              <div style={{ width: '100%', marginRight: '10px' }}>
+                <div>课程对比</div>
+                <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'1100px'} style={{ padding: 0 }} {...this.props} />
+              </div>
+              <div style={{ width: '100%' }}>
+                <div>总目标统计</div>
                 <Chart chartData={chartBarData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
               </div>
             </div>

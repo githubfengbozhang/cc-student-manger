@@ -271,7 +271,7 @@ class Index extends Component {
     let answer = this.answerType(values)
 
     const query = {
-      answerFlag: 1,
+      answerFlag: this.state.questionSqNo === this.state.examSort.length ? 1:0,
       answerResult: answer,
       courseId,
       paperId,

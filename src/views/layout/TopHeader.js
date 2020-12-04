@@ -98,13 +98,13 @@ class TopHeader extends Component {
           <Icon type="user" />
           {Object.keys(this.props.userInfo).length > 0 && this.props.userInfo.role.name}
         </Menu.Item>
-        <Menu.Item key="logout" onClick={this.handleLogout}>
-          <Icon type="logout" />
-					退出登录
-        </Menu.Item>
         <Menu.Item key="password" onClick={this.changePassword}>
             <Icon type="eye-invisible" />
 					修改密码
+        </Menu.Item>
+        <Menu.Item key="logout" onClick={this.handleLogout}>
+          <Icon type="logout" />
+					退出登录
         </Menu.Item>
       </Menu>
     );
@@ -126,7 +126,6 @@ class TopHeader extends Component {
         },
       };
     const validateMode = (rule, value, callback) =>{
-        debugger
       if(value === getFieldValue("newpassword")){
         callback();
       }else{
@@ -171,7 +170,7 @@ class TopHeader extends Component {
                 <Form.Item>
                     {getFieldDecorator('oldpassword', {
                         rules: [{ required: true, message: '请输入旧密码'},
-                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '只能包含数字和字母7-15位的字符'}],
+                                { pattern:/^[a-zA-Z0-9]{6,15}$/,message: '只能包含数字或字母6-15位的字符'}],
                         validateTrigger:'onBlur'
                     })(
                         <Input
@@ -184,7 +183,7 @@ class TopHeader extends Component {
                 <Form.Item>
                     {getFieldDecorator('newpassword', {
                         rules: [{ required: true, message: '请输入包含数字、字母的密码' },
-                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '只能包含数字和字母7-15位的字符'}],
+                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '只能包含数字或字母7-15位的字符'}],
                         validateTrigger:'onBlur'
                     })(
                         <Input
@@ -197,7 +196,7 @@ class TopHeader extends Component {
                 <Form.Item>
                     {getFieldDecorator('clpassword', {
                         rules: [{ required: true, message: '请输入包含数字、字母的密码' },
-                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '包含数字和字母7-15位的字符'},
+                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '包含数字或字母7-15位的字符'},
                                 {validator: validateMode}],
                         validateTrigger:'onBlur'
                     })(

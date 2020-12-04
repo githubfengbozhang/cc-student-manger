@@ -124,7 +124,7 @@ class Index extends Component {
     let that = this;
     const { questionData: { examSort }, courseId, paperId, paperType } = this.props.location.state;
     const examSortObject = examSort[questionSqNo - 1];
-    if(examSortObject){
+    if(!examSortObject){
         return
     }
     const questionId = Object.keys(examSortObject)[0]
@@ -266,7 +266,7 @@ class Index extends Component {
     //   answer = values.answer.join(',')
     // }
     const query = {
-      answerFlag: 1,
+      answerFlag: this.state.questionSqNo === this.state.examSort.length ? 1:0,
       answerResult: answer,
       courseId,
       paperId,
@@ -279,17 +279,15 @@ class Index extends Component {
         // 考试完毕
         if (this.state.questionSqNo === this.state.examSort.length) {
           this.info('您已考试完毕,请返回列表!')
-          return
+        }else{
+            this.setState({
+                questionSqNo: this.state.questionSqNo + 1,
+                ansItem: ''
+            }, () => {
+                this.getQuestion(this.state.questionSqNo)
+            })
         }
-        this.setState({
-          questionSqNo: this.state.questionSqNo + 1,
-          ansItem: ''
-        }, () => {
-          this.getQuestion(this.state.questionSqNo)
-        })
-
       }
-
     })
   }
   answerType = (answer) => {

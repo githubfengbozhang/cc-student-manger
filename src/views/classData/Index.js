@@ -3,6 +3,8 @@ import './index.scss';
 import { Select, Form, DatePicker, Button, Table } from 'antd';
 import Chart from '@/components/chart/Chart';
 import { connect } from 'react-redux';
+import $axios from "@/axios/$axios";
+import qs from 'qs';
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -164,31 +166,69 @@ const columns = [
 class Index extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {courseSelectList:[]}
   }
   handleChange = (value) => {
     console.log(`selected ${value}`);
   }
+  componentDidMount () {
+    this.getCourseSelectList()
+  }
   onChange = () => { }
+    // 课程下拉数据
+  getCourseSelectList = () => {
+    let that = this;
+    debugger
+    // let status = that.state.status
+    $axios.post("/exam/api/student/course/queryCourseByUserId").then((res) => {
+        const {
+        code,
+        data
+        } = res.data
+        if (code === 0) {
+        that.setState({
+            courseSelectList: data
+        })
+        }
+    })
+    }
   render () {
     const layout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 18 },
+      labelCol: { span: 8 },
+      wrapperCol: { span: 16 },
       layout: 'inline'
     };
+    const { getFieldDecorator } = this.props.form;
+    const { courseSelectList } = this.state;
     return (
       <div >
         <div className="query-content">
           <Form  {...layout}>
+            <FormItem label="课程" name="class">
+              {
+                getFieldDecorator('courseId')(
+                  <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择课程">
+                    <Option value='' >全部</Option>
+                    {
+                      courseSelectList.map((item, key) => <Option value={item.courseId} key={key}>{item.courseName}</Option>)
+                    }
+                  </Select>
+                )
+              }
+            </FormItem>
             <FormItem label="时间" name="size">
               <RangePicker onChange={() => this.onChange} />
             </FormItem>
-            <FormItem label="课程" name="class">
-              <Select defaultValue="学习中" style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择课程状态">
-                <Option value="全部">全部</Option>
-                <Option value="已结束">已结束</Option>
-                <Option value="学习中">学习中</Option>
-              </Select>
+            <FormItem label="任务类型" name="class">
+              {
+                getFieldDecorator('type')(
+                  <Select style={{ width: 150 }} onChange={this.handleChange} placeholder="请选择课程状态">
+                    <Option value="">全部</Option>
+                    <Option value="0">考试</Option>
+                    <Option value="1">作业测试</Option>
+                  </Select>
+                )
+              }
             </FormItem>
             <FormItem name="size">
               <Button type="primary" className="ml-20">查询</Button>
@@ -222,4 +262,4 @@ const mapStateToProps = state => {
     collapse: state.collapse
   };
 };
-export default connect(mapStateToProps)(Index);
+export default connect(mapStateToProps)(Form.create()(Index));

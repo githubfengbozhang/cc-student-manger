@@ -32,14 +32,19 @@ export const menus = [
         path: '/view',
         title: '查看',
         hidden: true
+      },
+      {
+        path: '/classData',
+        title: '综合分析',
+        hidden: true
       }
     ]
   },
-  {
-    path: '/classData',
-    title: '课程数据',
-    icon: 'area-chart',
-  },
+//   {
+//     path: '/classData',
+//     title: '课程数据',
+//     icon: 'area-chart',
+//   },
   {
     path: '/studyRoom',
     title: '自习室',

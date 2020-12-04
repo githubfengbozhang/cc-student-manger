@@ -9,7 +9,7 @@ import 'moment/locale/zh-cn';
 
 import Vconsole from 'vconsole'
 
-const vconsole = new Vconsole()
+// const vconsole = new Vconsole()
 
 moment.locale('en');
 console.log(`Looks like we are in ${process.env.REACT_APP_BASE_URL} mode!`);
