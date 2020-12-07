@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Avatar, Dropdown, Menu, Modal, Form, Input,Row, Col,Button } from 'antd';
+import { Icon, Avatar, Dropdown, Menu, Modal, Form, Input, Row, Col, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { setUserInfo } from '@/redux/actions/userInfo';
@@ -14,7 +14,7 @@ import qs from 'qs';
 import $axios from "@/axios/$axios";
 
 class TopHeader extends Component {
-  state = { visible: false,changePassword:false };
+  state = { visible: false, changePassword: false };
   handleLogout = () => {
     this.props.setUserInfo({});
     this.props.emptyTag();
@@ -23,27 +23,35 @@ class TopHeader extends Component {
     this.props.history.push('/');
   };
   // 修改密码
-  changePassword =() => {
+  changePassword = () => {
     this.setState({
-        changePassword:true
+      changePassword: true
     })
   };
-  
+
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const {clpassword,newpassword,oldpassword} = values
-        $axios.post("/exam/api/student/single/modifyPwd", qs.stringify({ clpassword,newpassword,oldpassword}))
-        this.setState({
-            changePassword: false,
-        });
+        const { clpassword, newpassword, oldpassword } = values
+        $axios.post("/exam/api/student/single/modifyPwd", qs.stringify({ clpassword, newpassword, oldpassword })).then((res) => {
+          const { code, msg } = res.data
+          if (code === 200) {
+            message.success(msg);
+            this.setState({
+              changePassword: false,
+            });
+          } else {
+            message.error(msg);
+          }
+        })
+
       }
     });
   };
   handleCancel = e => {
     this.setState({
-        changePassword: false,
+      changePassword: false,
     });
   };
   componentDidMount () {
@@ -99,7 +107,7 @@ class TopHeader extends Component {
           {Object.keys(this.props.userInfo).length > 0 && this.props.userInfo.role.name}
         </Menu.Item>
         <Menu.Item key="password" onClick={this.changePassword}>
-            <Icon type="eye-invisible" />
+          <Icon type="eye-invisible" />
 					修改密码
         </Menu.Item>
         <Menu.Item key="logout" onClick={this.handleLogout}>
@@ -111,24 +119,24 @@ class TopHeader extends Component {
     const { tags } = this.props;
     const { changePassword } = this.state;
 
-    const { getFieldDecorator,getFieldValue } = this.props.form;
+    const { getFieldDecorator, getFieldValue } = this.props.form;
 
     const tailFormItemLayout = {
-        wrapperCol: {
-          xs: {
-            span: 24,
-            offset: 0,
-          },
-          sm: {
-            span: 16,
-            offset: 8,
-          },
+      wrapperCol: {
+        xs: {
+          span: 24,
+          offset: 0,
         },
-      };
-    const validateMode = (rule, value, callback) =>{
-      if(value === getFieldValue("newpassword")){
+        sm: {
+          span: 16,
+          offset: 8,
+        },
+      },
+    };
+    const validateMode = (rule, value, callback) => {
+      if (value === getFieldValue("newpassword")) {
         callback();
-      }else{
+      } else {
         callback("2次密码不一样");
       }
     }
@@ -159,70 +167,70 @@ class TopHeader extends Component {
             </div>
           </div>
         </div>
-        {changePassword?
-            <Modal
+        {changePassword ?
+          <Modal
             title="密码修改"
             visible={changePassword}
             onCancel={this.handleCancel}
             footer={null}
           >
             <Form className="login-form" onSubmit={this.handleSubmit} ref="getFormVlaue">
-                <Form.Item>
-                    {getFieldDecorator('oldpassword', {
-                        rules: [{ required: true, message: '请输入旧密码'},
-                                { pattern:/^[a-zA-Z0-9]{6,15}$/,message: '只能包含数字或字母6-15位的字符'}],
-                        validateTrigger:'onBlur'
-                    })(
-                        <Input
-                        prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        placeholder="请输入旧密码"
-                        autoComplete="off"
-                        />,
-                    )}
-                </Form.Item>
-                <Form.Item>
-                    {getFieldDecorator('newpassword', {
-                        rules: [{ required: true, message: '请输入包含数字、字母的密码' },
-                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '只能包含数字或字母7-15位的字符'}],
-                        validateTrigger:'onBlur'
-                    })(
-                        <Input
-                        prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        placeholder="请输入新密码"
-                        autoComplete="off"
-                        />,
-                    )}
-                </Form.Item>
-                <Form.Item>
-                    {getFieldDecorator('clpassword', {
-                        rules: [{ required: true, message: '请输入包含数字、字母的密码' },
-                                { pattern:/^[a-zA-Z0-9]{7,15}$/,message: '包含数字或字母7-15位的字符'},
-                                {validator: validateMode}],
-                        validateTrigger:'onBlur'
-                    })(
-                        <Input
-                        prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        placeholder="请确认密码"
-                        autoComplete="off"
-                        />,
-                    )}
-                </Form.Item>
-                <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                    <Col span={12}>
+              <Form.Item>
+                {getFieldDecorator('oldpassword', {
+                  rules: [{ required: true, message: '请输入旧密码' },
+                  { pattern: /^[a-zA-Z0-9]{6,15}$/, message: '只能包含数字或字母6-15位的字符' }],
+                  validateTrigger: 'onBlur'
+                })(
+                  <Input
+                    prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    placeholder="请输入旧密码"
+                    autoComplete="off"
+                  />,
+                )}
+              </Form.Item>
+              <Form.Item>
+                {getFieldDecorator('newpassword', {
+                  rules: [{ required: true, message: '请输入包含数字、字母的密码' },
+                  { pattern: /^[a-zA-Z0-9]{7,15}$/, message: '只能包含数字或字母7-15位的字符' }],
+                  validateTrigger: 'onBlur'
+                })(
+                  <Input
+                    prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    placeholder="请输入新密码"
+                    autoComplete="off"
+                  />,
+                )}
+              </Form.Item>
+              <Form.Item>
+                {getFieldDecorator('clpassword', {
+                  rules: [{ required: true, message: '请输入包含数字、字母的密码' },
+                  { pattern: /^[a-zA-Z0-9]{7,15}$/, message: '包含数字或字母7-15位的字符' },
+                  { validator: validateMode }],
+                  validateTrigger: 'onBlur'
+                })(
+                  <Input
+                    prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    placeholder="请确认密码"
+                    autoComplete="off"
+                  />,
+                )}
+              </Form.Item>
+              <Form.Item {...tailFormItemLayout}>
+                <Row>
+                  <Col span={12}>
                     <Button type="primary" htmlType="submit">
-                    确认
+                      确认
                     </Button>
-                    </Col>
-                    <Col span={12}>
+                  </Col>
+                  <Col span={12}>
                     <Button onClick={this.handleCancel}>
-                    取消
+                      取消
                     </Button>
-                    </Col>
-                    </Row>
-    </Form.Item>
+                  </Col>
+                </Row>
+              </Form.Item>
             </Form>
-          </Modal>:null
+          </Modal> : null
         }
         {tags.show ? <Tags /> : null}
         <BasicDrawer title="系统设置" closable onClose={this.onClose} visible={this.state.visible} onChangeTags={this.onChangeTags} onChangeBreadCrumb={this.onChangeBreadCrumb} onChangeTheme={this.onChangeTheme} {...this.props} />

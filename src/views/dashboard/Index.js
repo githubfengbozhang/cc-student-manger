@@ -4,8 +4,10 @@ import Chart from '@/components/chart/Chart';
 import { connect } from 'react-redux';
 import { Pagination } from 'antd';
 import './index.scss';
-import {targetChart,testChart} from './options.js'
-
+import { targetChart, testChart, examResultChart, examChart, examChart1 } from './options.js'
+import qs from 'qs';
+import $axios from "@/axios/$axios";
+import jangbei from '../../../src/assets/img/jangbei.jpg';
 
 const chartBarData = {
   backgroundColor: '#fff',
@@ -118,11 +120,152 @@ class Index extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      noData: false
+      noData: false,
+      targetCharList: [],
+      testChartList: [],
+      examResultChartList: [],
+      rankDesc: '',
+      rank: '',
+      rankTixin: '',
+      total: '',
+      title: '',
+      examChartList: [],
+      examChartList1: []
     }
   }
+  // 总目标统计
+  getTargetChar = () => {
+    let courseId = -1
+    $axios.post("/exam/api/student/report/queryIndexTargetCharByCourseId", qs.stringify({ courseId })).then(res => {
+      const {
+        code,
+        data: {
+          content
+        }
+      } = res.data
+
+      const tempList = content.map(item => {
+        const tempObject = {
+          value: item.typeNum * 1,
+          name: item.targetName
+        }
+        return tempObject
+      })
+
+      if (code === 0) {
+        this.setState({
+          targetCharList: tempList
+        })
+      }
+    })
+  }
+  // 测试
+  getTestChart = () => {
+    let flagType = 1
+    $axios.post("/exam/api/student/report/queryIndexExamNumByUserId", qs.stringify({ flagType })).then(res => {
+      const {
+        code,
+        data: {
+          content
+        }
+      } = res.data
+      const tempList = content.map(item => {
+        const tempObject = {
+          value: item.num * 1,
+          name: item.type
+        }
+        return tempObject
+      })
+
+      if (code === 0) {
+        this.setState({
+          testChartList: tempList
+        })
+      }
+    })
+
+  }
+
+  // 近期课程
+  getExamResultChart = () => {
+    $axios.post("/exam/api/student/report/queryIndexExamResultByCourseId").then(res => {
+      const {
+        code,
+        data: {
+          content,
+          rankDesc,
+          rankTixin,
+          total,
+          title,
+          rank
+        }
+      } = res.data
+      const tempList = content.map(item => {
+        const tempObject = {
+          value: item.total,
+          name: item.title
+        }
+        return tempObject
+      })
+
+      if (code === 0) {
+        this.setState({
+          examResultChartList: tempList,
+          rankDesc,
+          rankTixin,
+          total,
+          title,
+          rank
+        })
+      }
+    })
+
+  }
+
+  // 课程对比
+  getExamChartChart = () => {
+    let flagType = 1
+    $axios.post("/exam/api/student/report/queryIndexExamChartByUserId", qs.stringify({ flagType })).then(res => {
+      const {
+        code,
+        data: {
+          content,
+          nl,
+          sz,
+          zs
+        }
+      } = res.data
+      const tempList = content.map(item => {
+        const tempObject = {
+          value: item.num,
+          name: item.time
+        }
+        return tempObject
+      })
+
+      if (code === 0) {
+        const tempObject = {
+          "知识": zs,
+          "能力": nl,
+          "素质": sz
+        }
+        this.setState({
+          examChartList: tempList,
+          examChartList1: tempObject,
+        })
+      }
+    })
+
+  }
+
+  componentDidMount () {
+    this.getTargetChar()
+    this.getTestChart()
+    this.getExamResultChart()
+    this.getExamChartChart()
+  }
   render () {
-    const { state } = this.state
+    const { state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1 } = this.state
     const cardContent = `欢迎登录重庆工业职业技术学院人才培养管理监测系统。`
     return (
       <div >
@@ -137,25 +280,54 @@ class Index extends Component {
             <div className="data-flex">
               <div style={{ width: '100%', marginRight: '10px' }}>
                 <div>总目标统计</div>
-                <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                {
+
+                  targetCharList.length > 0 ? <Chart chartData={targetChart(targetCharList)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} /> : null
+                }
               </div>
               <div style={{ width: '100%' }}>
                 <div>测试统计</div>
-                <Chart chartData={testChart()} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                {
+                  testChartList.length > 0 ? <Chart chartData={testChart(testChartList)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                    : null
+                }
+
               </div>
               <div style={{ width: '100%', marginLeft: '10px' }}>
                 <div>近期课程</div>
-                <Chart chartData={chartBarData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                {
+                  examResultChartList.length > 0 ? <Chart chartData={examResultChart(examResultChartList, total, title)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} /> :
+                    null
+                }
+
               </div>
             </div>
             <div className="data-flex">
               <div style={{ width: '100%', marginRight: '10px' }}>
                 <div>课程对比</div>
-                <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'1100px'} style={{ padding: 0 }} {...this.props} />
+                <div className="exam-chart">
+                  <div>
+                    {
+                      examChartList.length > 0 ? <Chart chartData={examChart(examChartList)} className={'block-line'} height={'400px'} width={'650px'} style={{ padding: 0 }} {...this.props} /> :
+                        null
+                    }
+                  </div>
+                  <div>
+                    {
+                      examChartList.length > 0 ? <Chart chartData={examChart1(examChartList1)} className={'block-line'} height={'400px'} width={'450px'} style={{ padding: 0 }} {...this.props} /> :
+                        null
+                    }
+                  </div>
+                </div>
+                {/* <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'1100px'} style={{ padding: 0 }} {...this.props} /> */}
               </div>
               <div style={{ width: '100%' }}>
                 <div>总目标统计</div>
-                <Chart chartData={chartBarData} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
+                <div className="mubiao">
+                  <img src={jangbei} className="imgSrc" />
+                  <div style={{ margin: "50px 20px" }}>{rankDesc}</div>
+                  <div>{rankTixin}</div>
+                </div>
               </div>
             </div>
           </div>

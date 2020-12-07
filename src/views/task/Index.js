@@ -153,16 +153,47 @@ class Index extends Component {
     let that = this;
     let { history } = that.props
 
-    const { courseId, paperId, paperType, userId, taskExamStatus, status } = record
+    const { courseId, paperId, paperType, userId, taskExamStatus, status, examBeginTime, examEndTime, systemTime } = record
+    const tempExamEndTime = new Date(examEndTime)
+    const tempSystemTime = new Date()
+    const tempExamBeginTime = new Date(examBeginTime)
+    // 考试时间结束
+    if (tempExamEndTime.getTime() < tempSystemTime.getTime()) {
+      notification['info']({
+        message: '温馨提示！',
+        description:
+          '亲爱的同学,考试时间已结束。',
+      });
+      return
+    }
+    // 开始时间验证
+    if (tempExamBeginTime.getTime() > tempSystemTime.getTime()) {
+      notification['info']({
+        message: '温馨提示！',
+        description:
+          '亲爱的同学,答题时间还未开始，请耐心等待。',
+      });
+      return
+    }
+    // paperType 0 为考试 1为作业
+    // taskExamStatus 0是完成
+    if (taskExamStatus * 1 === 0) {
+      notification['info']({
+        message: '温馨提示！',
+        description:
+          '亲爱的同学,您已答题完成，请再任务时间之后查看答题结果。',
+      });
+      return
+    }
+
+
     $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
       const {
         code,
         data
       } = res.data
       if (code === 0) {
-        const examEndTime = new Date(data.examEndTime)
-        const systemTime = new Date(data.systemTime)
-        const examBeginTime = new Date(data.examBeginTime)
+
         if (data.examSort.length === 0 && status * 1 === 0) {
           notification['info']({
             message: '温馨提示！',
@@ -171,34 +202,7 @@ class Index extends Component {
           });
           return
         }
-        // 考试时间结束
-        if (examEndTime.getTime() < systemTime.getTime()) {
-          notification['info']({
-            message: '温馨提示！',
-            description:
-              '亲爱的同学,考试时间已结束。',
-          });
-          return
-        }
-        // 开始时间验证
-        if (examBeginTime.getTime() > systemTime.getTime()) {
-          notification['info']({
-            message: '温馨提示！',
-            description:
-              '亲爱的同学,答题时间还未开始，请耐心等待。',
-          });
-          return
-        }
-        // paperType 0 为考试 1为作业
-        // taskExamStatus 0是完成
-        if (taskExamStatus * 1 === 0) {
-          notification['info']({
-            message: '温馨提示！',
-            description:
-              '亲爱的同学,您已答题完成，请再任务时间之后查看答题结果。',
-          });
-          return
-        }
+
         history.push({ pathname: '/question', state: { 'questionData': data, ...record } })
         localStorage.setItem('/question', JSON.stringify({ 'questionData': data, ...record }))
       }
@@ -226,7 +230,7 @@ class Index extends Component {
   /**
    * 综合分析
    */
-  analysis = (e,record) => {
+  analysis = (e, record) => {
     e.preventDefault();
     let that = this;
     let { history } = that.props
@@ -360,21 +364,22 @@ class Index extends Component {
               key="action"
               width={150}
               render={(text, record) => {
-                if(record.status * 1 === 1){
-                   return (
+                if (record.status * 1 === 1) {
+                  return (
                     <span>
-                        <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
-                        <Divider type="vertical" />
-                        <a href='/#' onClick={(e) => this.analysis(e, record)}>综合分析</a>
-                  </span>
-                   )
-                }else{
-                    return (
-                        <span>
-                            <a onClick={(e) => this.exam(e, record)}>答题</a>
-                        </span>
-                    )
+                      <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
+                      <Divider type="vertical" />
+                      <a href='/#' onClick={(e) => this.analysis(e, record)}>综合分析</a>
+                    </span>
+                  )
+                } else {
+                  return (
+                    <span>
+                      <a onClick={(e) => this.exam(e, record)}>答题</a>
+                    </span>
+                  )
                 }
+
               }}
             />
           </Table>
