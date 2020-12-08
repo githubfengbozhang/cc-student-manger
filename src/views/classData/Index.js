@@ -166,7 +166,7 @@ const columns = [
 class Index extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {courseSelectList:[]}
+    this.state = { courseSelectList: [] }
   }
   handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -175,23 +175,22 @@ class Index extends React.Component {
     this.getCourseSelectList()
   }
   onChange = () => { }
-    // 课程下拉数据
+  // 课程下拉数据
   getCourseSelectList = () => {
     let that = this;
-    debugger
     // let status = that.state.status
     $axios.post("/exam/api/student/course/queryCourseByUserId").then((res) => {
-        const {
+      const {
         code,
         data
-        } = res.data
-        if (code === 0) {
+      } = res.data
+      if (code === 0) {
         that.setState({
-            courseSelectList: data
+          courseSelectList: data
         })
-        }
+      }
     })
-    }
+  }
   render () {
     const layout = {
       labelCol: { span: 8 },

@@ -39,7 +39,7 @@ export const targetChart = (params) => {
         type: 'pie',
         clockWise: false, //顺时加载
         hoverAnimation: false, //鼠标移入变大
-        radius: [73 - i * 15 + '%', 68 - i * 15 + '%'],
+        radius: [55 - i * 15 + '%', 58 - i * 15 + '%'],
         center: ["30%", "55%"],
         label: {
           show: false
@@ -76,7 +76,7 @@ export const targetChart = (params) => {
         z: 1,
         clockWise: false, //顺时加载
         hoverAnimation: false, //鼠标移入变大
-        radius: [73 - i * 15 + '%', 68 - i * 15 + '%'],
+        radius: [55 - i * 15 + '%', 58 - i * 15 + '%'],
         center: ["30%", "55%"],
         label: {
           show: false
@@ -122,7 +122,7 @@ export const targetChart = (params) => {
       show: true,
       icon: "circle",
       top: "center",
-      left: '70%',
+      left: '80%',
       data: arrName,
       width: 50,
       padding: [0, 5],
@@ -155,7 +155,6 @@ export const targetChart = (params) => {
     grid: {
       top: '16%',
       bottom: '53%',
-      left: "30%",
       containLabel: false
     },
     yAxis: [{
@@ -185,198 +184,195 @@ export const targetChart = (params) => {
   }
   )
 }
-
-// 测试统计
-export const testChart = (params) => {
-  const placeHolderStyle = {
-    normal: {
-      label: {
-        show: false
-      },
-      labelLine: {
-        show: false
-      },
-      color: "rgba(0,0,0,0)",
-      borderWidth: 0
+const placeHolderStyle1 = {
+  normal: {
+    label: {
+      show: false
     },
-    emphasis: {
-      color: "rgba(0,0,0,0)",
-      borderWidth: 0
+    labelLine: {
+      show: false
+    },
+    color: "rgba(0,0,0,0)",
+    borderWidth: 0
+  },
+  emphasis: {
+    color: "rgba(0,0,0,0)",
+    borderWidth: 0
+  }
+};
+const dataStyle = {
+  normal: {
+    formatter: '{c}',
+    position: 'center',
+    show: true,
+    textStyle: {
+      fontSize: '40',
+      fontWeight: 'normal',
+      color: '#34374E'
     }
-  };
-  const dataStyle = {
-    normal: {
-      formatter: '{c}',
-      position: 'center',
-      show: true,
-      textStyle: {
-        fontSize: '40',
-        fontWeight: 'normal',
-        color: '#34374E'
-      }
-    }
-  };
-  return ({
-    backgroundColor: '#fff',
-    title: [{
-      text: '作业次数',
-      left: '29.8%',
-      top: '60%',
+  }
+};
+// 测试统计
+export const testChart = (params) => ({
+  backgroundColor: '#fff',
+  title: [{
+    text: '作业次数',
+    left: '29.8%',
+    top: '60%',
+    textAlign: 'center',
+    textStyle: {
+      fontWeight: 'normal',
+      fontSize: '16',
+      color: '#AAAFC8',
       textAlign: 'center',
-      textStyle: {
-        fontWeight: 'normal',
-        fontSize: '16',
-        color: '#AAAFC8',
-        textAlign: 'center',
+    },
+  }, {
+    text: '考试次数',
+    left: '70%',
+    top: '60%',
+    textAlign: 'center',
+    textStyle: {
+      color: '#AAAFC8',
+      fontWeight: 'normal',
+      fontSize: '16',
+      textAlign: 'center',
+    },
+  }],
+
+  //第一个图表
+  series: [{
+    type: 'pie',
+    hoverAnimation: false, //鼠标经过的特效
+    radius: ['25%', '30%'],
+    center: ['30%', '50%'],
+    startAngle: 225,
+    labelLine: {
+      normal: {
+        show: false
+      }
+    },
+    label: {
+      normal: {
+        position: 'center'
+      }
+    },
+    data: [{
+      value: 100,
+      itemStyle: {
+        normal: {
+          color: '#E1E8EE'
+        }
       },
     }, {
-      text: '考试次数',
-      left: '70%',
-      top: '60%',
-      textAlign: 'center',
-      textStyle: {
-        color: '#AAAFC8',
-        fontWeight: 'normal',
-        fontSize: '16',
-        textAlign: 'center',
-      },
-    }],
-
-    //第一个图表
-    series: [{
-      type: 'pie',
-      hoverAnimation: false, //鼠标经过的特效
-      radius: ['25%', '30%'],
-      center: ['30%', '50%'],
-      startAngle: 225,
-      labelLine: {
-        normal: {
-          show: false
-        }
-      },
-      label: {
-        normal: {
-          position: 'center'
-        }
-      },
-      data: [{
-        value: 100,
-        itemStyle: {
-          normal: {
-            color: '#E1E8EE'
-          }
-        },
-      }, {
-        value: 35,
-        itemStyle: placeHolderStyle,
-      },
-
-      ]
-    },
-    //上层环形配置
-    {
-      type: 'pie',
-      hoverAnimation: false, //鼠标经过的特效
-      radius: ['25%', '30%'],
-      center: ['30%', '50%'],
-      startAngle: 225,
-      labelLine: {
-        normal: {
-          show: false
-        }
-      },
-      label: {
-        normal: {
-          position: 'center'
-        }
-      },
-      data: [{
-        value: params[0].value,
-        itemStyle: {
-          normal: {
-            color: '#6F78CC'
-          }
-        },
-        label: dataStyle,
-      }, {
-        value: 35,
-        itemStyle: placeHolderStyle,
-      },
-
-      ]
+      value: 35,
+      itemStyle: placeHolderStyle1,
     },
 
-
-    //第二个图表
-    {
-      type: 'pie',
-      hoverAnimation: false,
-      radius: ['25%', '30%'],
-      center: ['70%', '50%'],
-      startAngle: 225,
-      labelLine: {
-        normal: {
-          show: false
-        }
-      },
-      label: {
-        normal: {
-          position: 'center'
-        }
-      },
-      data: [{
-        value: 100,
-        itemStyle: {
-          normal: {
-            color: '#E1E8EE'
-
-
-          }
-        },
-
-      }, {
-        value: 35,
-        itemStyle: placeHolderStyle,
-      },
-
-      ]
-    },
-
-    //上层环形配置
-    {
-      type: 'pie',
-      hoverAnimation: false,
-      radius: ['25%', '30%'],
-      center: ['70%', '50%'],
-      startAngle: 225,
-      labelLine: {
-        normal: {
-          show: false
-        }
-      },
-      label: {
-        normal: {
-          position: 'center'
-        }
-      },
-      data: [{
-        value: params[1].value,
-        itemStyle: {
-          normal: {
-            color: '#4897f6'
-          }
-        },
-        label: dataStyle,
-      }, {
-        value: 55,
-        itemStyle: placeHolderStyle,
-      },
-
-      ]
-    },
     ]
-  })
-}
+  },
+  //上层环形配置
+  {
+    type: 'pie',
+    hoverAnimation: false, //鼠标经过的特效
+    radius: ['25%', '30%'],
+    center: ['30%', '50%'],
+    startAngle: 225,
+    labelLine: {
+      normal: {
+        show: false
+      }
+    },
+    label: {
+      normal: {
+        position: 'center'
+      }
+    },
+    data: [{
+      value: params[0].value,
+      itemStyle: {
+        normal: {
+          color: '#6F78CC'
+        }
+      },
+      label: dataStyle,
+    }, {
+      value: 35,
+      itemStyle: placeHolderStyle1,
+    },
+
+    ]
+  },
+
+
+  //第二个图表
+  {
+    type: 'pie',
+    hoverAnimation: false,
+    radius: ['25%', '30%'],
+    center: ['70%', '50%'],
+    startAngle: 225,
+    labelLine: {
+      normal: {
+        show: false
+      }
+    },
+    label: {
+      normal: {
+        position: 'center'
+      }
+    },
+    data: [{
+      value: 100,
+      itemStyle: {
+        normal: {
+          color: '#E1E8EE'
+
+
+        }
+      },
+
+    }, {
+      value: 35,
+      itemStyle: placeHolderStyle1,
+    },
+
+    ]
+  },
+
+  //上层环形配置
+  {
+    type: 'pie',
+    hoverAnimation: false,
+    radius: ['25%', '30%'],
+    center: ['70%', '50%'],
+    startAngle: 225,
+    labelLine: {
+      normal: {
+        show: false
+      }
+    },
+    label: {
+      normal: {
+        position: 'center'
+      }
+    },
+    data: [{
+      value: params[1].value,
+      itemStyle: {
+        normal: {
+          color: '#4897f6'
+        }
+      },
+      label: dataStyle,
+    }, {
+      value: 55,
+      itemStyle: placeHolderStyle1,
+    },
+
+    ]
+  },
+  ]
+})
 
 // 近期课程
 export const examResultChart = (params, total, title) => {
@@ -466,7 +462,7 @@ export const examResultChart = (params, total, title) => {
             position: "inner", //显示在扇形上
             formatter: function (name) {
               let value = sum === 0 ? 0 : name.value / sum
-              return `${value}%`
+              return `${value * 100}%`
             }, //显示内容
             textStyle: {
               color: "white", // 改变标示文字的颜色

@@ -86,8 +86,10 @@ class Index extends Component {
     this.getData()
     this.getCourseSelectList()
   }
-  handleChange = (value) => {
-    console.log(`selected ${value}`);
+  handleChange = (courseId) => {
+    this.setState({
+      courseId
+    })
   }
   /**
    * 提交查询

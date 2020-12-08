@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import TypingCard from '../../components/TypingCard'
 import Chart from '@/components/chart/Chart';
 import { connect } from 'react-redux';
-import { Pagination } from 'antd';
+import { Pagination, DatePicker, Select } from 'antd';
 import './index.scss';
 import { targetChart, testChart, examResultChart, examChart, examChart1 } from './options.js'
 import qs from 'qs';
 import $axios from "@/axios/$axios";
 import jangbei from '../../../src/assets/img/jangbei.jpg';
+const { MonthPicker, RangePicker } = DatePicker;
+const { Option } = Select;
 
 const chartBarData = {
   backgroundColor: '#fff',
@@ -124,18 +126,26 @@ class Index extends Component {
       targetCharList: [],
       testChartList: [],
       examResultChartList: [],
+      courseSelectList: [],
       rankDesc: '',
       rank: '',
       rankTixin: '',
+      courseId: '',
       total: '',
       title: '',
+      mode: ['month', 'month'],
       examChartList: [],
-      examChartList1: []
+      examChartList1: [],
+      testTime: '', // 测试时间查询
+      examTime: '', // 课程对比
     }
   }
   // 总目标统计
   getTargetChar = () => {
-    let courseId = -1
+    let { courseId } = this.state
+    if (!courseId) {
+      courseId = -1
+    }
     $axios.post("/exam/api/student/report/queryIndexTargetCharByCourseId", qs.stringify({ courseId })).then(res => {
       const {
         code,
@@ -161,8 +171,9 @@ class Index extends Component {
   }
   // 测试
   getTestChart = () => {
-    let flagType = 1
-    $axios.post("/exam/api/student/report/queryIndexExamNumByUserId", qs.stringify({ flagType })).then(res => {
+    let flagType = 1;
+    const { testTime } = this.state
+    $axios.post("/exam/api/student/report/queryIndexExamNumByUserId", qs.stringify({ flagType, time: testTime })).then(res => {
       const {
         code,
         data: {
@@ -176,7 +187,6 @@ class Index extends Component {
         }
         return tempObject
       })
-
       if (code === 0) {
         this.setState({
           testChartList: tempList
@@ -225,7 +235,8 @@ class Index extends Component {
   // 课程对比
   getExamChartChart = () => {
     let flagType = 1
-    $axios.post("/exam/api/student/report/queryIndexExamChartByUserId", qs.stringify({ flagType })).then(res => {
+    const { examTime } = this.state
+    $axios.post("/exam/api/student/report/queryIndexExamChartByUserId", qs.stringify({ flagType, timeBgn: examTime[0], timeEnd: examTime[0] })).then(res => {
       const {
         code,
         data: {
@@ -257,15 +268,56 @@ class Index extends Component {
     })
 
   }
-
+  /**
+   * 测试时间查询
+   */
+  testDate = (valvalue, dateStringue) => {
+    this.setState({
+      testTime: dateStringue
+    }, () => {
+      this.getTestChart()
+    })
+  }
+  handlePanelChange = (value, mode) => {
+    this.setState({
+      examTime: value
+    })
+  }
+  handleChange = value => {
+  };
+  // 课程下拉数据
+  getCourseSelectList = () => {
+    let that = this;
+    let status = that.state.status
+    let courseId = that.state.courseId
+    $axios.post("/exam/api/student/course/queryCourseByUserId", qs.stringify({ status, courseId })).then((res) => {
+      const {
+        code,
+        data
+      } = res.data
+      if (code === 0) {
+        that.setState({
+          courseSelectList: data
+        })
+      }
+    })
+  }
+  selecthHandleChange = (courseId) => {
+    this.setState({
+      courseId
+    }, () => {
+      this.getTargetChar()
+    })
+  }
   componentDidMount () {
     this.getTargetChar()
     this.getTestChart()
     this.getExamResultChart()
     this.getExamChartChart()
+    this.getCourseSelectList()
   }
   render () {
-    const { state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1 } = this.state
+    const { courseSelectList, courseId, state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1, examTime } = this.state
     const cardContent = `欢迎登录重庆工业职业技术学院人才培养管理监测系统。`
     return (
       <div >
@@ -278,16 +330,26 @@ class Index extends Component {
         <div className="shadow-radius">
           <div className="chart-block">
             <div className="data-flex">
-              <div style={{ width: '100%', marginRight: '10px' }}>
+              <div style={{ width: '100%', marginRight: '10px', position: 'relative' }}>
+                <div className="query">课程：
+                <Select style={{ width: 150 }} value={courseId} onSelect={(e) => this.selecthHandleChange(e)} placeholder="请选择课程">
+                    <Option value='' >全部</Option>
+                    {
+                      courseSelectList.map((item, key) => <Option value={item.courseId} key={key}>{item.courseName}</Option>)
+                    }
+                  </Select>
+                </div>
                 <div>总目标统计</div>
                 {
 
                   targetCharList.length > 0 ? <Chart chartData={targetChart(targetCharList)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} /> : null
                 }
               </div>
-              <div style={{ width: '100%' }}>
+              <div style={{ width: '100%', position: 'relative' }}>
                 <div>测试统计</div>
+                <div className="query">时间：<MonthPicker onChange={this.testDate.bind(this)} placeholder="请选择时间" /></div>
                 {
+
                   testChartList.length > 0 ? <Chart chartData={testChart(testChartList)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} />
                     : null
                 }
@@ -303,8 +365,18 @@ class Index extends Component {
               </div>
             </div>
             <div className="data-flex">
-              <div style={{ width: '100%', marginRight: '10px' }}>
+              <div style={{ width: '100%', marginRight: '10px', position: 'relative' }}>
                 <div>课程对比</div>
+                <div className="query">时间：
+                <RangePicker
+                    placeholder={['Start month', 'End month']}
+                    value={examTime}
+                    format="YYYY-MM"
+                    mode={['month', 'month']}
+                    onChange={this.handleChange.bind(this)}
+                    onPanelChange={this.handlePanelChange.bind(this)}
+                  />
+                </div>
                 <div className="exam-chart">
                   <div>
                     {
@@ -331,7 +403,6 @@ class Index extends Component {
               </div>
             </div>
           </div>
-          <Pagination defaultCurrent={1} total={50} className="mt-40" />
         </div>
       </div>
     );
