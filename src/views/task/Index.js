@@ -375,8 +375,6 @@ class Index extends Component {
                 } else {
                   return (
                     <span>
-                      <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
-                      <Divider type="vertical" />
                       <a onClick={(e) => this.exam(e, record)}>答题</a>
                     </span>
                   )
