@@ -11,113 +11,6 @@ import jangbei from '../../../src/assets/img/jangbei.jpg';
 const { MonthPicker, RangePicker } = DatePicker;
 const { Option } = Select;
 
-const chartBarData = {
-  backgroundColor: '#fff',
-  title: {
-    top: 30,
-    text: '推荐提升',
-    textStyle: {
-      fontWeight: 'normal',
-      fontSize: 16,
-      color: '#57617B'
-    },
-    left: 'center'
-  },
-  tooltip: {
-    trigger: 'axis'
-  },
-  // tab
-  legend: {
-    data: ['基础知识', '课程学习', '考试通过率'],
-    right: '2%',
-    top: 20
-  },
-  grid: {
-    top: 80,
-    left: '2%',
-    right: '2%',
-    bottom: '6%',
-    containLabel: true
-  },
-  // x轴
-  xAxis: [
-    {
-      type: 'category', //分类
-      data: ['JAVA', 'SQL数据库', 'HTML', '数据算法', '网络应用', 'CSS3', 'JAVASCRIPT', '计算机组装', 'Web开发', '计算机应用']
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      axisLabel: {
-        formatter: '{value}'
-      }
-    }
-  ],
-  series: [
-    {
-      name: '基础知识',
-      type: 'bar',
-      data: [8.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0],
-      markPoint: {
-        data: [{ type: 'max', name: '最大值' }, { type: 'min', name: '最小值' }]
-      },
-      markLine: {
-        data: [{ type: 'average', name: '平均值' }]
-      },
-      itemStyle: {
-        normal: {
-          // 设置柱状图颜色
-          color: '#1890FF',
-          // 以下为是否显示，显示位置和显示格式的设置了
-          label: {
-            show: true,
-            position: 'top',
-            formatter: '{c}'
-            // formatter: '{b}\n{c}'
-          }
-        }
-      }
-      // 设置柱的宽度，要是数据太少，柱子太宽不美观~
-      // barWidth:100
-    },
-    {
-      name: '课程学习',
-      type: 'bar',
-      data: [10.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8],
-      markPoint: {
-        data: [{ name: '年最高', value: 182.2, xAxis: 7, yAxis: 183 }, { name: '年最低', value: 2.3, xAxis: 11, yAxis: 3 }]
-      },
-      markLine: {
-        data: [{ type: 'average', name: '平均值' }]
-      },
-      itemStyle: {
-        normal: {
-          // 设置柱状图颜色
-          color: '#001529'
-        }
-      }
-    },
-    {
-      name: '考试通过率',
-      type: 'bar',
-      data: [10.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8],
-      markPoint: {
-        data: [{ name: '年最高', value: 182.2, xAxis: 7, yAxis: 183 }, { name: '年最低', value: 2.3, xAxis: 11, yAxis: 3 }]
-      },
-      markLine: {
-        data: [{ type: 'average', name: '平均值' }]
-      },
-      itemStyle: {
-        normal: {
-          // 设置柱状图颜色
-          color: '#20e0ce'
-        }
-      }
-    }
-  ]
-};
-
 class Index extends Component {
   constructor(props) {
     super(props)
@@ -137,7 +30,7 @@ class Index extends Component {
       examChartList: [],
       examChartList1: [],
       testTime: '', // 测试时间查询
-      examTime: '', // 课程对比
+      examTime: [], // 课程对比
     }
   }
   // 总目标统计
@@ -217,7 +110,6 @@ class Index extends Component {
         }
         return tempObject
       })
-
       if (code === 0) {
         this.setState({
           examResultChartList: tempList,
@@ -279,11 +171,14 @@ class Index extends Component {
     })
   }
   handlePanelChange = (value, mode) => {
+    debugger
     this.setState({
-      examTime: value
-    })
+      examTime: value,
+      mode: [mode[0] === 'date' ? 'month' : mode[0], mode[1] === 'date' ? 'month' : mode[1]],
+    });
   }
   handleChange = value => {
+    debugger
   };
   // 课程下拉数据
   getCourseSelectList = () => {
@@ -317,7 +212,7 @@ class Index extends Component {
     this.getCourseSelectList()
   }
   render () {
-    const { courseSelectList, courseId, state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1, examTime } = this.state
+    const { mode, courseSelectList, courseId, state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1, examTime } = this.state
     const cardContent = `欢迎登录重庆工业职业技术学院人才培养管理监测系统。`
     return (
       <div >
@@ -368,28 +263,19 @@ class Index extends Component {
               <div style={{ width: '100%', marginRight: '10px', position: 'relative' }}>
                 <div>课程对比</div>
                 <div className="query">时间：
-                <RangePicker
-                    placeholder={['Start month', 'End month']}
-                    value={examTime}
-                    format="YYYY-MM"
-                    mode={['month', 'month']}
-                    onChange={this.handleChange.bind(this)}
-                    onPanelChange={this.handlePanelChange.bind(this)}
-                  />
+                <MonthPicker placeholder="选择开始日期" />
+                  <span style={{ padding: '0 15px' }}>至</span>
+                  <MonthPicker placeholder="选择结束日期" />
                 </div>
                 <div className="exam-chart">
-                  <div>
-                    {
-                      examChartList.length > 0 ? <Chart chartData={examChart(examChartList)} className={'block-line'} height={'400px'} width={'650px'} style={{ padding: 0 }} {...this.props} /> :
-                        null
-                    }
-                  </div>
-                  <div>
-                    {
-                      examChartList.length > 0 ? <Chart chartData={examChart1(examChartList1)} className={'block-line'} height={'400px'} width={'450px'} style={{ padding: 0 }} {...this.props} /> :
-                        null
-                    }
-                  </div>
+                  {
+                    examChartList.length > 0 ? <Chart chartData={examChart(examChartList)} className={'block-line'} height={'400px'} width={'650px'} style={{ padding: 0 }} {...this.props} /> :
+                      null
+                  }
+                  {
+                    examChartList.length > 0 ? <Chart chartData={examChart1(examChartList1)} className={'block-line'} height={'400px'} width={'450px'} style={{ padding: 0 }} {...this.props} /> :
+                      null
+                  }
                 </div>
                 {/* <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'1100px'} style={{ padding: 0 }} {...this.props} /> */}
               </div>

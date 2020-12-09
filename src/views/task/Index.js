@@ -318,6 +318,7 @@ class Index extends Component {
             <Column title="开始时间" dataIndex="examBeginTime" key="examBeginTime" />
             <Column title="结束时间" dataIndex="examEndTime" key="examEndTime" />
             <Column title="考试时长" dataIndex="duration" key="duration" />
+            <Column title="分数" dataIndex="score" key="score" />
             <Column title="状态" dataIndex="status" key="status"
               render={(text, record) => {
                 if (record.status * 1 === 0) {

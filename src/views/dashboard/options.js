@@ -243,7 +243,7 @@ export const testChart = (params) => ({
   series: [{
     type: 'pie',
     hoverAnimation: false, //鼠标经过的特效
-    radius: ['25%', '30%'],
+    radius: ['35%', '40%'],
     center: ['30%', '50%'],
     startAngle: 225,
     labelLine: {
@@ -274,7 +274,7 @@ export const testChart = (params) => ({
   {
     type: 'pie',
     hoverAnimation: false, //鼠标经过的特效
-    radius: ['25%', '30%'],
+    radius: ['35%', '40%'],
     center: ['30%', '50%'],
     startAngle: 225,
     labelLine: {
@@ -308,7 +308,7 @@ export const testChart = (params) => ({
   {
     type: 'pie',
     hoverAnimation: false,
-    radius: ['25%', '30%'],
+    radius: ['35%', '40%'],
     center: ['70%', '50%'],
     startAngle: 225,
     labelLine: {
@@ -343,7 +343,7 @@ export const testChart = (params) => ({
   {
     type: 'pie',
     hoverAnimation: false,
-    radius: ['25%', '30%'],
+    radius: ['35%', '40%'],
     center: ['70%', '50%'],
     startAngle: 225,
     labelLine: {
@@ -376,116 +376,65 @@ export const testChart = (params) => ({
 
 // 近期课程
 export const examResultChart = (params, total, title) => {
-  // let list = [{
-  //   name: "新闻",
-  //   value: "66"
-  // }, {
-  //   name: "微博",
-  //   value: "90"
-  // }, {
-  //   name: "__other",
-  //   value: "0"
-  // }]
-  let list = []
-  const nameList = params.map(item => item.name)
-  list = params
-  list.push({
-    value: "0",
-    name: "__other"
-  })
-  if (params[0].value * 1 === 0 && params[1].value * 1 === 0) {
-    list.push({
-      value: "0",
-      name: "__other"
-    })
-  }
-
-
-  let sum = 0;
-  list.map((item, index) => {
-    sum += parseInt(item.value)
-  })
-
-  list[list.length - 1].value = sum
-  let colorList = ['#33ccff', '#3399ff', "rgba(0,0,0,0)"]
-  console.log(list)
-  return (
-    {
-      title: [{
-        text: `共${total}题`,
-        left: '50.8%',
-        top: '60%',
-        textAlign: 'center',
-        textStyle: {
-          fontWeight: 'normal',
-          fontSize: '16',
-          color: '#AAAFC8',
-          textAlign: 'center',
-        },
-      }, {
-        text: title,
-        left: '50.8%',
-        top: '70%',
-        textAlign: 'center',
-        textStyle: {
-          fontWeight: 'normal',
-          fontSize: '16',
-          color: '#AAAFC8',
-          textAlign: 'center',
-        },
-      }],
-      tooltip: {},
-      legend: {
-        icon: "circle",
-        orient: 'horizontal',
-        // x: 'left',
-        data: nameList,
-        right: 200,
-        bottom: 350,
-        align: 'right',
-        textStyle: {
-          color: "#000000"
-        },
-        itemGap: 20
-      },
-      color: colorList,
-      series: [{
-        name: "",
-        type: "pie",
-        hoverAnimation: false,
-        startAngle: -180,
-        radius: ["60%", "100%"],
-        center: ["50%", "70%"],
-        label: {
-          normal: {
-            show: true,
-            position: "inner", //显示在扇形上
-            formatter: function (name) {
-              let value = sum === 0 ? 0 : name.value / sum
-              return `${value * 100}%`
-            }, //显示内容
-            textStyle: {
-              color: "white", // 改变标示文字的颜色
-              fontSize: 12, //文字大小
-              fontWeight: "bold",
+  var color = ['#FC4567', '#2F8DF4', '#C25EC4']
+  return ({
+    color: color,
+    title: {
+      text: `共${total}题`,
+      subtext: title,
+      left: 'center',
+      top: '45%',
+      textStyle: {
+        fontSize: 22,
+        color: '#000000',
+        fontWeight: 'normal'
+      }
+    },
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      orient: 'vertical',
+      right: 20,
+      top: 20
+    },
+    series: [{
+      type: 'pie',
+      roseType: 'radius',
+      radius: ['30%', '60%'],
+      data: params,
+      label: {
+        normal: {
+          formatter: '{font|{c}}\n{hr|}\n{font|{d}%}',
+          rich: {
+            font: {
+              fontSize: 20,
+              padding: [5, 0],
+              color: '#000000'
             },
-          },
+            hr: {
+              height: 0,
+              borderWidth: 1,
+              width: '100%',
+              borderColor: '#000000'
+            }
+          }
         },
-        labelLine: {
-          normal: {
-            show: false,
-          },
-        },
-        data: list,
+      },
+      labelLine: {
+        lineStyle: {
+          color: '#000000'
+        }
+      },
+      emphasis: {
         itemStyle: {
-          emphasis: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: "rgba(0, 0, 0, 0.5)",
-          },
-        },
-      },],
-    })
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0,0,0,0.5)'
+        }
+      }
+    }]
+  })
 }
 
 // 课程对比

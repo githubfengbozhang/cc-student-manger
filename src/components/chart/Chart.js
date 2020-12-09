@@ -1,88 +1,73 @@
-/*
- * ECharts 组件基础部分
- * 传入 option 和渲染方式 renderer
- * */
-
-import React, { PureComponent } from 'react';
-import * as echarts from 'echarts';
-import 'zrender/lib/svg/svg';
+import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
+import echarts from 'echarts';
 import { debounce } from '@/utils';
 
-export default class Chart extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: '100%',
-      height: '100%',
-    };
-    this.chart = null;
-  }
-  async componentDidMount () {
-    // 初始化图表
-    await this.initChart(this.el);
-    // 将传入的配置(包含数据)注入
-    this.setOption(this.props.chartData);
-    // 监听屏幕缩放，重新绘制 echart 图表
-    window.addEventListener('resize', debounce(this.resize, 100));
+class Chart extends Component {
+  static propTypes = {
+    width: PropTypes.string.isRequired,
+    height: PropTypes.string.isRequired,
+    className: PropTypes.string.isRequired,
+    style: PropTypes.object.isRequired,
+    chartData: PropTypes.object.isRequired
+  };
+  static defaultProps = {
+    width: '100%',
+    height: '340px',
+    // className: 'shadow-radius',
+    style: {},
+    chartData: {}
+  };
+
+  state = { chart: null };
+
+  componentDidMount () {
+    debounce(this.initChart.bind(this), 500)(); //初始化图表
+    window.addEventListener('resize', () => this.resize()); // 监听窗口，变化时重置图表
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.collapse.isCollapsed !== this.props.collapse.isCollapsed) {
+      this.resize();
+    }
+  }
   componentDidUpdate () {
     // 每次更新组件都重置
-    this.setOption(this.props.chartData);
+    debounce(this.initChart.bind(this), 500)(); //初始化图表
   }
-
   componentWillUnmount () {
-    // 组件卸载前卸载图表
     this.dispose();
   }
-  render () {
-    const { width, height } = this.state;
 
-    return (
-      <div
-        className='default-chart'
-        ref={el => (this.el = el)}
-        style={{ width, height }}
-      />
+  // 重置图表
+  resize () {
+    const chart = this.state.chart;
+    if (chart) {
+      debounce(chart.resize.bind(this), 300)();
+    }
+  }
+
+  initChart () {
+    if (!this.el) return;
+    this.setState(
+      {
+        chart: echarts.init(this.el, 'macarons')
+      },
+      () => {
+        this.state.chart.setOption(this.props.chartData, true);
+      }
     );
   }
-  initChart = el => {
-    // renderer 用于配置渲染方式 可以是 svg 或者 canvas
-    const renderer = this.props.renderer || 'canvas';
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        this.chart = echarts.init(el, null, {
-          renderer,
-          width: 'auto',
-          height: 'auto',
-        });
-        resolve();
-      }, 0);
-    });
-  };
-  setOption = option => {
-    if (!this.chart) {
-      return;
-    }
-
-    const notMerge = this.props.notMerge;
-    const lazyUpdate = this.props.lazyUpdate;
-
-    this.chart.setOption(option, notMerge, lazyUpdate);
-  };
-  dispose = () => {
-    if (!this.chart) {
-      return;
-    }
-
-    this.chart.dispose();
-    this.chart = null;
-  };
-  resize = () => {
-    this.chart && this.chart.resize();
-  };
-  getInstance = () => {
-    return this.chart;
-  };
+  dispose () {
+    if (!this.state.chart) return;
+    window.removeEventListener('resize', () => this.resize()); // 移除窗口，变化时重置图表
+    this.setState({ chart: null });
+  }
+  render () {
+    const { className, height, width, style } = this.props;
+    return <div className={className} ref={el => (this.el = el)} style={{ ...style, height, width }} />;
+  }
 }
+
+export default Chart;
