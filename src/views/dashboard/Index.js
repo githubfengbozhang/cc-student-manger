@@ -272,13 +272,24 @@ class Index extends Component {
                 }
 
               </div>
-              <div style={{ width: '100%', marginLeft: '10px' }}>
+
+            </div>
+            <div className="data-flex">
+              <div style={{ width: '100%', marginRight: '10px' }}>
                 <div>近期课程</div>
                 {
                   examResultChartList.length > 0 ? <Chart chartData={examResultChart(examResultChartList, total, title)} className={'block-line'} height={'400px'} width={'100%'} style={{ padding: 0 }} {...this.props} /> :
                     null
                 }
 
+              </div>
+              <div style={{ width: '100%' }} >
+                <div>总目标统计</div>
+                <div className="mubiao" className="block-line mubiao" style={{ height: '400px' }}>
+                  <img src={jangbei} className="imgSrc" />
+                  <div style={{ margin: "50px 20px" }}>{rankDesc}</div>
+                  <div>{rankTixin}</div>
+                </div>
               </div>
             </div>
             <div className="data-flex">
@@ -301,14 +312,7 @@ class Index extends Component {
                 </div>
                 {/* <Chart chartData={targetChart()} className={'block-line'} height={''} width={'1100px'} style={{ padding: 0 }} {...this.props} /> */}
               </div>
-              <div style={{ width: '100%' }} >
-                <div>总目标统计</div>
-                <div className="mubiao" className="block-line mubiao" style={{ height: '400px' }}>
-                  <img src={jangbei} className="imgSrc" />
-                  <div style={{ margin: "50px 20px" }}>{rankDesc}</div>
-                  <div>{rankTixin}</div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
