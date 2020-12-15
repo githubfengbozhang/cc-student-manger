@@ -3,6 +3,7 @@ import TypingCard from '../../components/TypingCard'
 import Chart from '@/components/chart/Chart';
 import { connect } from 'react-redux';
 import { Pagination, DatePicker, Select } from 'antd';
+import moment from 'moment';
 import './index.scss';
 import { targetChart, testChart, examResultChart, examChart, examChart1 } from './options.js'
 import qs from 'qs';
@@ -10,6 +11,7 @@ import $axios from "@/axios/$axios";
 import jangbei from '../../../src/assets/img/jangbei.jpg';
 const { MonthPicker, RangePicker } = DatePicker;
 const { Option } = Select;
+
 
 class Index extends Component {
   constructor(props) {
@@ -30,7 +32,8 @@ class Index extends Component {
       examChartList: [],
       examChartList1: [],
       testTime: '', // 测试时间查询
-      examTime: [], // 课程对比
+      startTime: '', // 课程对比时间
+      endTime: ''
     }
   }
   // 总目标统计
@@ -127,8 +130,8 @@ class Index extends Component {
   // 课程对比
   getExamChartChart = () => {
     let flagType = 1
-    const { examTime } = this.state
-    $axios.post("/exam/api/student/report/queryIndexExamChartByUserId", qs.stringify({ flagType, timeBgn: examTime[0], timeEnd: examTime[0] })).then(res => {
+    const { startTime, endTime } = this.state
+    $axios.post("/exam/api/student/report/queryIndexExamChartByUserId", qs.stringify({ flagType, timeBgn: startTime, timeEnd: endTime })).then(res => {
       const {
         code,
         data: {
@@ -160,6 +163,35 @@ class Index extends Component {
     })
 
   }
+  starDate = (data, dateString) => {
+    this.setState({
+      startTime: dateString
+    })
+
+    if (this.state.endTime) {
+      if (dateString > this.state.endTime) {
+        this.setState({
+          endTime: null
+        })
+      } else {
+        this.getExamChartChart()
+      }
+    }
+  }
+  endDate = (data, dateString) => {
+    this.setState({
+      endTime: dateString
+    })
+    if (this.state.startTime) {
+      if (this.state.startTime > dateString) {
+        this.setState({
+          startTime: null
+        })
+      } else {
+        this.getExamChartChart()
+      }
+    }
+  }
   /**
    * 测试时间查询
    */
@@ -170,16 +202,6 @@ class Index extends Component {
       this.getTestChart()
     })
   }
-  handlePanelChange = (value, mode) => {
-    debugger
-    this.setState({
-      examTime: value,
-      mode: [mode[0] === 'date' ? 'month' : mode[0], mode[1] === 'date' ? 'month' : mode[1]],
-    });
-  }
-  handleChange = value => {
-    debugger
-  };
   // 课程下拉数据
   getCourseSelectList = () => {
     let that = this;
@@ -212,7 +234,7 @@ class Index extends Component {
     this.getCourseSelectList()
   }
   render () {
-    const { mode, courseSelectList, courseId, state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1, examTime } = this.state
+    const { endTime, startTime, courseSelectList, courseId, state, targetCharList, testChartList, examResultChartList, rankDesc, rankTixin, total, title, examChartList, rank, examChartList1, examTime } = this.state
     const cardContent = `欢迎登录重庆工业职业技术学院人才培养管理监测系统。`
     return (
       <div >
@@ -263,25 +285,25 @@ class Index extends Component {
               <div style={{ width: '100%', marginRight: '10px', position: 'relative' }}>
                 <div>课程对比</div>
                 <div className="query">时间：
-                <MonthPicker placeholder="选择开始日期" />
+                <MonthPicker placeholder="选择开始日期" value={startTime ? moment(startTime, 'YYYY-MM') : null} onChange={this.starDate.bind(this)} />
                   <span style={{ padding: '0 15px' }}>至</span>
-                  <MonthPicker placeholder="选择结束日期" />
+                  <MonthPicker placeholder="选择结束日期" value={endTime ? moment(endTime, 'YYYY-MM') : null} onChange={this.endDate.bind(this)} />
                 </div>
                 <div className="exam-chart">
                   {
-                    examChartList.length > 0 ? <Chart chartData={examChart(examChartList)} className={'block-line'} height={'400px'} width={'650px'} style={{ padding: 0 }} {...this.props} /> :
+                    examChartList.length > 0 ? <Chart chartData={examChart(examChartList)} height={'400px'} width={'650px'} style={{ padding: 0 }} {...this.props} /> :
                       null
                   }
                   {
-                    examChartList.length > 0 ? <Chart chartData={examChart1(examChartList1)} className={'block-line'} height={'400px'} width={'450px'} style={{ padding: 0 }} {...this.props} /> :
+                    examChartList.length > 0 ? <Chart chartData={examChart1(examChartList1)} height={'400px'} width={'450px'} style={{ padding: 0 }} {...this.props} /> :
                       null
                   }
                 </div>
-                {/* <Chart chartData={targetChart()} className={'block-line'} height={'400px'} width={'1100px'} style={{ padding: 0 }} {...this.props} /> */}
+                {/* <Chart chartData={targetChart()} className={'block-line'} height={''} width={'1100px'} style={{ padding: 0 }} {...this.props} /> */}
               </div>
-              <div style={{ width: '100%' }}>
+              <div style={{ width: '100%' }} >
                 <div>总目标统计</div>
-                <div className="mubiao">
+                <div className="mubiao" className="block-line mubiao" style={{ height: '400px' }}>
                   <img src={jangbei} className="imgSrc" />
                   <div style={{ margin: "50px 20px" }}>{rankDesc}</div>
                   <div>{rankTixin}</div>

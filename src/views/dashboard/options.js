@@ -39,8 +39,8 @@ export const targetChart = (params) => {
         type: 'pie',
         clockWise: false, //顺时加载
         hoverAnimation: false, //鼠标移入变大
-        radius: [55 - i * 15 + '%', 58 - i * 15 + '%'],
-        center: ["30%", "55%"],
+        radius: [40 - i * 15 + '%', 45 - i * 15 + '%'],
+        center: ["40%", "55%"],
         label: {
           show: false
         },
@@ -76,8 +76,8 @@ export const targetChart = (params) => {
         z: 1,
         clockWise: false, //顺时加载
         hoverAnimation: false, //鼠标移入变大
-        radius: [55 - i * 15 + '%', 58 - i * 15 + '%'],
-        center: ["30%", "55%"],
+        radius: [40 - i * 15 + '%', 45 - i * 15 + '%'],
+        center: ["40%", "55%"],
         label: {
           show: false
         },
@@ -288,7 +288,7 @@ export const testChart = (params) => ({
       }
     },
     data: [{
-      value: params[0].value,
+      value: params[1].value,
       itemStyle: {
         normal: {
           color: '#6F78CC'
@@ -357,7 +357,7 @@ export const testChart = (params) => ({
       }
     },
     data: [{
-      value: params[1].value,
+      value: params[0].value,
       itemStyle: {
         normal: {
           color: '#4897f6'

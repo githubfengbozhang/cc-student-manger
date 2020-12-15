@@ -6,6 +6,7 @@
 }
 .exam-chart{
   display: flex;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.1);
 }
 .mubiao{
   display: flex;
@@ -13,6 +14,7 @@
   align-items: center;
   .imgSrc{
     width: 200px;
+    height: 200px;
   }
 }
 .query{

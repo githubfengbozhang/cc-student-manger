@@ -8,6 +8,7 @@ yarn.lock
 package-lock.json
 .rar
 .zip
+.rar
 # testing
 /coverage
 

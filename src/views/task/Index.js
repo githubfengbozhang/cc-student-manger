@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Select, Form, DatePicker, Button, Table, Divider, Modal, notification } from 'antd';
+import { Select, Form, DatePicker, Button, Table, Divider, Modal, notification, Progress } from 'antd';
 import './index.scss';
 import qs from 'qs';
 import $axios from "@/axios/$axios";
 import { withRouter } from 'react-router-dom'
+import Chart from '@/components/chart/Chart';
+import { taskChart, contrastChart } from './options.js'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -15,6 +17,7 @@ class Index extends Component {
     super(props)
     this.state = {
       visible: false,
+      visibleCharts: false,
       status: 0,
       courseId: '',
       beginTime: '',
@@ -45,6 +48,11 @@ class Index extends Component {
         visible: false,
       });
     })
+  }
+  handleCallCharts = () => {
+    this.setState({
+      visibleCharts: false,
+    });
   }
   onChangeRangePicker = (data) => {
   }
@@ -231,10 +239,13 @@ class Index extends Component {
    * 综合分析
    */
   analysis = (e, record) => {
-    e.preventDefault();
-    let that = this;
-    let { history } = that.props
-    history.push({ pathname: '/classData', state: { ...record } })
+    debugger
+    this.setState({
+      visibleCharts: true
+    })
+    // let that = this;
+    // let { history } = that.props
+    // history.push({ pathname: '/classData', state: { ...record } })
   }
   render () {
     const layout = {
@@ -254,7 +265,7 @@ class Index extends Component {
       onShowSizeChange: this.showSizeChange
     }
     const { getFieldDecorator } = this.props.form;
-    const { list, courseSelectList, visible, modalData } = this.state
+    const { list, courseSelectList, visible, modalData, visibleCharts } = this.state
     return (
       <div className="task">
         <div className="query-content">
@@ -370,12 +381,13 @@ class Index extends Component {
                     <span>
                       <a href='/#' onClick={(e) => this.view(e, record)}>查看</a>
                       <Divider type="vertical" />
-                      <a href='/#' onClick={(e) => this.analysis(e, record)}>综合分析</a>
+                      <a onClick={(e) => this.analysis(e, record)}>综合分析</a>
                     </span>
                   )
                 } else {
                   return (
                     <span>
+                      <a onClick={(e) => this.analysis(e, record)}>综合分析</a>
                       <a onClick={(e) => this.exam(e, record)}>答题</a>
                     </span>
                   )
@@ -397,6 +409,71 @@ class Index extends Component {
               maskClosable={false}
             >
               亲爱的同学，你当前还有一门考试 <span className="task-text-color">《{modalData.title}》</span> 需要去完成，请尽快处理！
+            </Modal> : null
+        }
+        {
+          visibleCharts ?
+            <Modal
+              title="任务提醒"
+              visible={visibleCharts}
+              onCancel={this.handleCallCharts}
+              cancelText="关闭"
+              okText=""
+              maskClosable={false}
+              style={{ height: '500px' }}
+            >
+              <div>
+                <div>
+                  <div>
+                    <div className="questionSum">答题总数</div>
+                    <div className="totalSum">50道</div>
+                  </div>
+                  <div>
+                    <div className="fraction questionSum">总分数：120</div>
+                    <div className="fraction questionTime">
+                      <div style={{ fontSize: '28px' }}>答题时间</div>
+                      <div className="totalSum" style={{ border: 'none' }}>
+                        <span>最长时间：120分钟</span><span style={{ marginLeft: '30px' }}>最短时间：40分钟</span></div>
+                    </div>
+                  </div>
+                  <div className="info">
+                    <div className="ranking">
+                      超过99%的人
+                      <Progress percent={30} size="small" />
+                    </div>
+
+                    <div>
+                      <div style={{ fontWeight: '800' }}>排名</div>
+                      <div>第18名</div>
+                    </div>
+                  </div>
+                  <div className="complete">
+                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
+                      JAVA完成情况
+                    <Progress percent={30} size="small" />
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
+                      C#完成情况
+                    <Progress percent={50} size="small" />
+                    </div>
+                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
+                      HTML完成情况
+                    <Progress percent={60} size="small" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="questionSum" style={{ padding: '20px 0' }}>需要加强的知识点：JAVA</div>
+                  </div>
+                  <div className="charts" style={{ marginTop: '0' }}>
+                    <Chart chartData={contrastChart()} className={'block-line'} height={'300px'} width={'100%'} style={{ padding: 0 }} />
+                  </div>
+                </div>
+
+                <div className="charts">
+                  <Chart chartData={taskChart()} className={'block-line'} height={'200px'} width={'100%'} style={{ padding: 0 }} />
+                </div>
+
+              </div>
             </Modal> : null
         }
       </div>
