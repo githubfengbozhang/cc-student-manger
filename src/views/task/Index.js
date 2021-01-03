@@ -6,6 +6,7 @@ import $axios from "@/axios/$axios";
 import { withRouter } from 'react-router-dom'
 import Chart from '@/components/chart/Chart';
 import { taskChart, contrastChart } from './options.js'
+import ExamAnalysis from './examAnalysis.js'
 
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -28,7 +29,8 @@ class Index extends Component {
       list: [],
       modalData: {},
       current: 1,
-      total: 0
+      total: 0,
+      rowObject: {} // 行详情数据
     };
   }
   // 弹窗确定
@@ -49,9 +51,14 @@ class Index extends Component {
       });
     })
   }
-  handleCallCharts = () => {
+  // handleCallCharts = () => {
+  //   this.setState({
+  //     visibleCharts: false,
+  //   });
+  // }
+  onChangeExamAnalysisVisible = (value) => {
     this.setState({
-      visibleCharts: false,
+      visibleCharts: value,
     });
   }
   onChangeRangePicker = (data) => {
@@ -194,7 +201,7 @@ class Index extends Component {
       return
     }
 
-
+    // 考试
     $axios.post("/exam/api/student/question/queryQuerstionSortByPaperId", qs.stringify({ courseId, paperId, paperType, userId })).then((res) => {
       const {
         code,
@@ -215,6 +222,7 @@ class Index extends Component {
         localStorage.setItem('/question', JSON.stringify({ 'questionData': data, ...record }))
       }
     })
+
   }
   /**
    * 查看
@@ -239,9 +247,9 @@ class Index extends Component {
    * 综合分析
    */
   analysis = (e, record) => {
-    debugger
     this.setState({
-      visibleCharts: true
+      visibleCharts: true,
+      rowObject: record
     })
     // let that = this;
     // let { history } = that.props
@@ -265,7 +273,7 @@ class Index extends Component {
       onShowSizeChange: this.showSizeChange
     }
     const { getFieldDecorator } = this.props.form;
-    const { list, courseSelectList, visible, modalData, visibleCharts } = this.state
+    const { list, courseSelectList, visible, modalData, visibleCharts, rowObject } = this.state
     return (
       <div className="task">
         <div className="query-content">
@@ -329,7 +337,7 @@ class Index extends Component {
             <Column title="开始时间" dataIndex="examBeginTime" key="examBeginTime" />
             <Column title="结束时间" dataIndex="examEndTime" key="examEndTime" />
             <Column title="考试时长" dataIndex="duration" key="duration" />
-            <Column title="分数" dataIndex="score" key="score" />
+            {/* <Column title="分数" dataIndex="score" key="score" /> */}
             <Column title="状态" dataIndex="status" key="status"
               render={(text, record) => {
                 if (record.status * 1 === 0) {
@@ -387,7 +395,7 @@ class Index extends Component {
                 } else {
                   return (
                     <span>
-                      <a onClick={(e) => this.analysis(e, record)}>综合分析</a>
+                      {/* <a onClick={(e) => this.analysis(e, record)}>综合分析</a> */}
                       <a onClick={(e) => this.exam(e, record)}>答题</a>
                     </span>
                   )
@@ -413,68 +421,70 @@ class Index extends Component {
         }
         {
           visibleCharts ?
-            <Modal
-              title="任务提醒"
-              visible={visibleCharts}
-              onCancel={this.handleCallCharts}
-              cancelText="关闭"
-              okText=""
-              maskClosable={false}
-              style={{ height: '500px' }}
-            >
-              <div>
-                <div>
-                  <div>
-                    <div className="questionSum">答题总数</div>
-                    <div className="totalSum">50道</div>
-                  </div>
-                  <div>
-                    <div className="fraction questionSum">总分数：120</div>
-                    <div className="fraction questionTime">
-                      <div style={{ fontSize: '28px' }}>答题时间</div>
-                      <div className="totalSum" style={{ border: 'none' }}>
-                        <span>最长时间：120分钟</span><span style={{ marginLeft: '30px' }}>最短时间：40分钟</span></div>
-                    </div>
-                  </div>
-                  <div className="info">
-                    <div className="ranking">
-                      超过99%的人
-                      <Progress percent={30} size="small" />
-                    </div>
+            <ExamAnalysis visibleCharts={visibleCharts} row={rowObject} onChangeExamAnalysisVisible={this.onChangeExamAnalysisVisible} /> : null
+          // <Modal
+          //   title="综合分析"
+          //   visible={visibleCharts}
+          //   onCancel={this.handleCallCharts}
+          //   cancelText="关闭"
+          //   okText=""
+          //   maskClosable={false}
+          //   style={{ height: '500px' }}
+          // >
+          //   <div>
+          //     <div>
+          //       <div>
+          //         <div className="questionSum">答题总数</div>
+          //         <div className="totalSum">50道</div>
+          //       </div>
+          //       <div>
+          //         <div className="questionSum">总分数</div>
+          //         <div className="totalSum">50道</div>
+          //         <div className="fraction questionTime">
+          //           <div style={{ fontSize: '28px' }}>答题时间</div>
+          //           <div className="totalSum" style={{ border: 'none' }}>
+          //             <span>用时最长的题目：120分钟</span><span style={{ marginLeft: '30px' }}>用时最少的题目：40分钟</span></div>
+          //         </div>
+          //       </div>
+          //       <div className="info">
+          //         <div className="ranking">
+          //           超过99%的人
+          //           <Progress percent={30} size="small" />
+          //         </div>
 
-                    <div>
-                      <div style={{ fontWeight: '800' }}>排名</div>
-                      <div>第18名</div>
-                    </div>
-                  </div>
-                  <div className="complete">
-                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
-                      JAVA完成情况
-                    <Progress percent={30} size="small" />
-                    </div>
-                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
-                      C#完成情况
-                    <Progress percent={50} size="small" />
-                    </div>
-                    <div style={{ fontSize: '14px', padding: '5px 0' }}>
-                      HTML完成情况
-                    <Progress percent={60} size="small" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="questionSum" style={{ padding: '20px 0' }}>需要加强的知识点：JAVA</div>
-                  </div>
-                  <div className="charts" style={{ marginTop: '0' }}>
-                    <Chart chartData={contrastChart()} className={'block-line'} height={'300px'} width={'100%'} style={{ padding: 0 }} />
-                  </div>
-                </div>
+          //         <div>
+          //           <div style={{ fontWeight: '800' }}>本次测试排名</div>
+          //           <div>第18名</div>
+          //         </div>
+          //       </div>
+          //       <div className="complete">
+          //         <div style={{ fontSize: '14px', padding: '5px 0' }}>
+          //           JAVA完成情况
+          //         <Progress percent={30} size="small" />
+          //         </div>
+          //         <div style={{ fontSize: '14px', padding: '5px 0' }}>
+          //           C#完成情况
+          //         <Progress percent={50} size="small" />
+          //         </div>
+          //         <div style={{ fontSize: '14px', padding: '5px 0' }}>
+          //           HTML完成情况
+          //         <Progress percent={60} size="small" />
+          //         </div>
+          //       </div>
+          //       <div>
+          //         <div className="questionSum" style={{ padding: '20px 0' }}>需要加强的知识点：JAVA</div>
+          //       </div>
+          //       <div className="charts" style={{ marginTop: '0' }}>
+          //         <Chart chartData={contrastChart()} className={'block-line'} height={'300px'} width={'100%'} style={{ padding: 0 }} />
+          //       </div>
+          //     </div>
 
-                <div className="charts">
-                  <Chart chartData={taskChart()} className={'block-line'} height={'200px'} width={'100%'} style={{ padding: 0 }} />
-                </div>
+          //     <div className="charts">
+          //       <Chart chartData={taskChart()} className={'block-line'} height={'200px'} width={'100%'} style={{ padding: 0 }} />
+          //     </div>
 
-              </div>
-            </Modal> : null
+          //   </div>
+          // </Modal> : null
         }
       </div>
     );

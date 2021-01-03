@@ -1,6 +1,32 @@
 import echarts from 'echarts'
-
-export const taskChart = () => ({
+const getData = (target) => {
+  let list = [];
+  ['能力', '素质', '知识'].map(itemName => {
+    // 当前目标集合
+    let targetList = target.filter(item => item.title === itemName)
+    // 当前目标集合对错总数
+    const targetTotol = targetList.map(item => item.num).reduce((total, num) => {
+      return total + num;
+    })
+    // 添加当前目标新属性
+    targetList = targetList.map(item => {
+      item.targetTotol = targetTotol
+      const tempObject = {
+        value: targetTotol,
+        num: item.num,
+        name: itemName,
+        flag: item.flag
+      }
+      return tempObject;
+    })
+    // 获取答题正确的目标
+    const tempList = targetList.filter(item => item.flag * 1 === 0)
+    // push到新集合对象中
+    list = [...list, ...tempList]
+  })
+  return list
+}
+export const taskChart = (target) => ({
   title: {
     text: '各科目标分析对比',
     subtext: '目标答对率',
@@ -8,7 +34,16 @@ export const taskChart = () => ({
   },
   tooltip: {
     trigger: 'item',
-    formatter: '{a} <br/>{b} : {c} ({d}%)'
+    // formatter: '{a} <br/>{b} : {c} ({d}%)'
+    formatter: function (dataSource) {
+      const { data: {
+        flag,
+        name,
+        num,
+        value
+      }, seriesName } = dataSource
+      return `${name}(${value})<br/>${seriesName}: (${((num / value).toFixed(2)) * 100}%)`
+    }
   },
   legend: {
     orient: 'vertical',
@@ -21,11 +56,8 @@ export const taskChart = () => ({
       type: 'pie',
       radius: '55%',
       center: ['50%', '60%'],
-      data: [
-        { value: 335, name: '能力' },
-        { value: 310, name: '素质' },
-        { value: 234, name: '知识' }
-      ],
+      hoverAnimation: false,
+      data: getData(target),
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
@@ -38,212 +70,152 @@ export const taskChart = () => ({
 }
 )
 
-export const contrastChart = () => {
-  let bgColor = "#fff";
-  let color = [
-    "#0090FF",
-    "#36CE9E",
-    "#FFC005",
-    "#FF515A",
-    "#8B5CFF",
-    "#00CA69"
-  ];
-  let echartData = [{
-    name: "JAVA",
-    value1: 100,
-    value2: 233
-  },
-  {
-    name: "C#",
-    value1: 138,
-    value2: 233
-  },
-  {
-    name: "HTML",
-    value1: 350,
-    value2: 200
-  },
-  {
-    name: "C++",
-    value1: 173,
-    value2: 180
-  }
-  ];
+export const contrastChart = (target) => {
+  // 过滤目标正确数据
+  const targetList = target.filter(item => item.flag * 1 === 0)
+  // 获取目标name集合
+  const nameList = targetList.map(item => item.title)
+  // 获取目标num集合
+  const numList = targetList.map(item => item.num)
+  return ({
+    title: {
+      text: '目标答题正确数',
+      textStyle: {
+        fontSize: 12,
+        fontWeight: 400
+      },
+      left: 'center',
+      top: '5%'
+    },
+    backgroundColor: '#fff',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      axisPointer: {
+        lineStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [{
+              offset: 0,
+              color: 'red'
+            }, {
+              offset: 0.5,
+              color: '#48b3FF',
+            }, {
+              offset: 1,
+              color: '#d9efff'
+            }],
+            global: false
+          }
+        },
+      },
+    },
+    grid: {
+      top: '5%',
+      left: '5%',
+      right: '3%',
+      bottom: '8%',
+      // containLabel: true
+    },
+    xAxis: [{
+      type: 'category',
+      color: '#59588D',
+      axisLine: {
+        show: true
+      },
+      axisLabel: {
+        color: '#282828'
+      },
+      splitLine: {
+        // show: true
+      },
 
-  let xAxisData = echartData.map(v => v.name);
-  //  ["1", "2", "3", "4", "5", "6", "7", "8"]
-  let yAxisData1 = echartData.map(v => v.value1);
-  // [100, 138, 350, 173, 180, 150, 180, 230]
-  let yAxisData2 = echartData.map(v => v.value2);
-  // [233, 233, 200, 180, 199, 233, 210, 180]
-  const hexToRgba = (hex, opacity) => {
-    let rgbaColor = "";
-    let reg = /^#[\da-f]{6}$/i;
-    if (reg.test(hex)) {
-      rgbaColor = `rgba(${parseInt("0x" + hex.slice(1, 3))},${parseInt(
-        "0x" + hex.slice(3, 5)
-      )},${parseInt("0x" + hex.slice(5, 7))},${opacity})`;
-    }
-    return rgbaColor;
-  }
-  return (
-    {
-      backgroundColor: bgColor,
-      color: color,
-      legend: {
-        right: 10,
-        top: 10
+      axisTick: {
+        show: false
+      },
+      // boundaryGap: true,
+      data: nameList,
+
+    }],
+
+    yAxis: [{
+      type: 'value',
+      min: 0,
+      splitNumber: 4,
+      splitLine: {
+        show: true,
+
+      },
+      axisLine: {
+        show: true,
+      },
+      axisLabel: {
+        show: true,
+        // margin: 20,
+        textStyle: {
+          color: '#737373',
+
+        },
+      },
+      axisTick: {
+        show: false,
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(131,101,101,0.2)',
+          type: 'dashed',
+        }
+      }
+    }],
+    series: [{
+      name: '',
+      type: 'line',
+      // smooth: true, //是否平滑
+      showAllSymbol: true,
+      symbol: 'circle',
+      symbolSize: 10,
+      lineStyle: {
+        normal: {
+          color: "#48B3FF"
+        },
+      },
+      label: {
+        show: false,
+        position: 'top',
+        textStyle: {
+          color: '#48B3FF',
+        }
+      },
+
+      itemStyle: {
+        color: "#FFF",
+        borderColor: "#48B3FF",
+        borderWidth: 2,
+
       },
       tooltip: {
-        trigger: "axis",
-        formatter: function (params) {
-          let html = '';
-          params.forEach(v => {
-            console.log(v)
-            html += `<div style="color: #666;font-size: 14px;line-height: 24px">
-                <span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${color[v.componentIndex]};"></span>
-                ${v.seriesName}.${v.name}
-                <span style="color:${color[v.componentIndex]};font-weight:700;font-size: 18px">${v.value}</span>
-                `;
-          })
-
-
-
-          return html
-        },
-        extraCssText: 'background: #fff; border-radius: 0;box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);color: #333;',
-        axisPointer: {
-          type: 'shadow',
-          shadowStyle: {
-            color: '#ffffff',
-            shadowColor: 'rgba(225,225,225,1)',
-            shadowBlur: 5
+        show: true
+      },
+      areaStyle: {
+        normal: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+            offset: 0,
+            color: 'rgba(195,230,255,1)'
+          },
+          {
+            offset: 1,
+            color: 'rgba(195,230,255,0.1)'
           }
+          ], false),
+          shadowColor: 'rgba(195,230,255,0.1)',
+          shadowBlur: 20
         }
       },
-      grid: {
-        top: 100,
-        containLabel: true
-      },
-      xAxis: [{
-        type: "category",
-        boundaryGap: false,
-        axisLabel: {
-          formatter: '{value}',
-          textStyle: {
-            color: "#333"
-          }
-        },
-        axisLine: {
-          lineStyle: {
-            color: "#D9D9D9"
-          }
-        },
-        data: xAxisData
-      }],
-      yAxis: [{
-        type: "value",
-        name: '正确率',
-        axisLabel: {
-          textStyle: {
-            color: "#666"
-          }
-        },
-        nameTextStyle: {
-          color: "#666",
-          fontSize: 12,
-          lineHeight: 40
-        },
-        splitLine: {
-          lineStyle: {
-            type: "dashed",
-            color: "#E9E9E9"
-          }
-        },
-        axisLine: {
-          show: false
-        },
-        axisTick: {
-          show: false
-        }
-      }],
-      series: [{
-        name: "本次",
-        type: "line",
-        smooth: true,
-        // showSymbol: false,/
-        symbolSize: 8,
-        zlevel: 3,
-        lineStyle: {
-          normal: {
-            color: color[0],
-            shadowBlur: 3,
-            shadowColor: hexToRgba(color[0], 0.5),
-            shadowOffsetY: 8
-          }
-        },
-        areaStyle: {
-          normal: {
-            color: new echarts.graphic.LinearGradient(
-              0,
-              0,
-              0,
-              1,
-              [{
-                offset: 0,
-                color: hexToRgba(color[0], 0.3)
-              },
-              {
-                offset: 1,
-                color: hexToRgba(color[0], 0.1)
-              }
-              ],
-              false
-            ),
-            shadowColor: hexToRgba(color[0], 0.1),
-            shadowBlur: 10
-          }
-        },
-        data: yAxisData1
-      }, {
-        name: "最近一次",
-        type: "line",
-        smooth: true,
-        // showSymbol: false,
-        symbolSize: 8,
-        zlevel: 3,
-        lineStyle: {
-          normal: {
-            color: color[1],
-            shadowBlur: 3,
-            shadowColor: hexToRgba(color[1], 0.5),
-            shadowOffsetY: 8
-          }
-        },
-        areaStyle: {
-          normal: {
-            color: new echarts.graphic.LinearGradient(
-              0,
-              0,
-              0,
-              1,
-              [{
-                offset: 0,
-                color: hexToRgba(color[1], 0.3)
-              },
-              {
-                offset: 1,
-                color: hexToRgba(color[1], 0.1)
-              }
-              ],
-              false
-            ),
-            shadowColor: hexToRgba(color[1], 0.1),
-            shadowBlur: 10
-          }
-        },
-        data: yAxisData2
-      }]
-    }
-  )
+      data: numList,
+    }]
+  })
 }

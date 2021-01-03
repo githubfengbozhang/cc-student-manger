@@ -14,7 +14,7 @@ class Chart extends Component {
   static defaultProps = {
     width: '100%',
     height: '340px',
-    // className: 'shadow-radius',
+    className: 'shadow-radius',
     style: {},
     chartData: {}
   };
@@ -31,10 +31,7 @@ class Chart extends Component {
       this.resize();
     }
   }
-  componentDidUpdate () {
-    // 每次更新组件都重置
-    debounce(this.initChart.bind(this), 500)(); //初始化图表
-  }
+
   componentWillUnmount () {
     this.dispose();
   }
